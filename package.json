@@ -13,11 +13,19 @@
   "packageManager": "pnpm@9.12.2+sha512.22721b3a11f81661ae1ec68ce1a7b879425a1ca5b991c975b074ac220b187ce56c708fe5db69f4c962c989452eee76c82877f4ee80f474cebd61ee13461b6228",
   "dependencies": {
     "dotenv": "^17.2.3",
-    "express": "^5.1.0"
+    "drizzle-zod": "^0.8.3",
+    "express": "^5.1.0",
+    "zod": "^4.1.11"
   },
   "devDependencies": {
     "@types/dotenv": "^8.2.3",
     "@types/express": "^5.0.3",
-    "@types/node": "^24.6.1"
+    "@types/jest": "^30.0.0",
+    "@types/node": "^24.6.1",
+    "@types/supertest": "^6.0.3",
+    "jest": "^30.2.0",
+    "supertest": "^7.1.4",
+    "ts-jest": "^29.4.4",
+    "typescript": "^5.9.3"
   }
 }
