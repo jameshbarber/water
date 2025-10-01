@@ -13,9 +13,9 @@ export default class Module {
     private dbSchema: any;
     private name: string;
     private exposeEndpoints: boolean;
-    private endpointSchemas: EndpointSchemas;
+    private endpointSchemas?: EndpointSchemas;
 
-    constructor(schema: any, name: string, exposeEndpoints: boolean, endpointSchemas: EndpointSchemas) {
+    constructor(schema: any, name: string, exposeEndpoints: boolean, endpointSchemas?: EndpointSchemas) {
         this.dbSchema = schema;
         this.name = name;
         this.exposeEndpoints = exposeEndpoints;
