@@ -1,5 +1,5 @@
 import { z } from "zod";
-
+import { DatabaseAdapter } from "@/lib/database/adaptor";
 
 type EndpointSchemas = {
     post?: z.ZodSchema;
@@ -10,7 +10,7 @@ type EndpointSchemas = {
 
 export default class Module {
 
-    private dbSchema: any;
+    private dbSchema: DatabaseAdapter<any>;
     private name: string;
     private exposeEndpoints: boolean;
     private endpointSchemas?: EndpointSchemas;
