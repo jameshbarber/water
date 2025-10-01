@@ -2,6 +2,7 @@
 import fs from "fs";
 import path from "path";
 import { DatabaseAdapter, Where } from "@/lib/database/types";
+import { randomUUID } from "crypto";
 
 
 type JsonStore<T> = { items: T[] };
@@ -49,10 +50,8 @@ export class JsonFileAdapter<T extends { id: string | number }> implements Datab
     async create({ data }: { data: T | Omit<T, "id"> }): Promise<T> {
         const store = this.read();
         const item = (data as T);
-        // If id missing, auto-assign numeric increasing id
         if ((item as any).id === undefined || (item as any).id === null) {
-            const maxId = store.items.reduce((m, i: any) => Math.max(m, Number(i.id) || 0), 0);
-            (item as any).id = maxId + 1;
+            (item as any).id = randomUUID();
         }
         store.items.push(item);
         this.write(store);
