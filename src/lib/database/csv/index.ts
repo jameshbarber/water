@@ -2,6 +2,7 @@
 import fs from "fs";
 import path from "path";
 import { DatabaseAdapter, Where } from "@/lib/database/types";
+import { randomUUID } from "crypto";
 
 export class CsvFileAdapter<T extends { id: string | number }> implements DatabaseAdapter<T> {
     private filePath: string;
@@ -65,8 +66,9 @@ export class CsvFileAdapter<T extends { id: string | number }> implements Databa
         const items = this.readAll();
         const item = (data as any);
         if (item.id === undefined || item.id === null) {
-            const maxId = items.reduce((m, i: any) => Math.max(m, Number(i.id) || 0), 0);
-            item.id = maxId + 1;
+            item.id = randomUUID();
+        } else {
+            item.id = String(item.id);
         }
         items.push(item);
         this.writeAll(items);
@@ -77,10 +79,13 @@ export class CsvFileAdapter<T extends { id: string | number }> implements Databa
         const items = this.readAll();
         const idx = items.findIndex(i => this.matchWhere(i, where));
         if (idx === -1) return null;
-        const updated = { ...(items[idx] as any), ...(data as any) } as T;
+        const updated = { ...(items[idx] as any), ...(data as any) } as any;
+        if (updated.id !== undefined && updated.id !== null) {
+            updated.id = String(updated.id);
+        }
         items[idx] = updated;
         this.writeAll(items);
-        return updated;
+        return updated as T;
     }
 
     async delete({ where }: { where: Where<T> }): Promise<T | null> {
