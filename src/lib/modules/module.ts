@@ -22,10 +22,41 @@ export default class Module {
         this.endpointSchemas = endpointSchemas;
     }
 
-    createEndpoints() {
-        const endpoints = [];
+    findOne(id: string) {
+        return this.dbSchema.findOne({
+            where: {
+                id: id
+            }
+        })
+    }
 
-        return endpoints;
+    findMany(where: any) {
+        return this.dbSchema.findMany({
+            where: where
+        })
+    }
+
+    create(data: any) {
+        return this.dbSchema.create({
+            data: data
+        })
+    }
+    
+    update(id: string, data: any) {
+        return this.dbSchema.update({
+            where: {
+                id: id
+            },
+            data: data
+        })
+    }
+
+    delete(id: string) {
+        return this.dbSchema.delete({
+            where: {
+                id: id
+            }
+        })
     }
     
 }
