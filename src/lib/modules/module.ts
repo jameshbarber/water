@@ -9,6 +9,7 @@ type EndpointSchemas = {
 }
 
 export default class Module {
+
     private dbSchema: any;
     private name: string;
     private exposeEndpoints: boolean;
@@ -26,43 +27,5 @@ export default class Module {
 
         return endpoints;
     }
-
-    createServices() {
-        const services = [];
-    }
-
-    createControllers() {
-        const controllers = [];
-
-        return controllers;
-    }
-    
-    createModels() {
-        const models = [];
-
-        return models;
-    }
-    
-    createEvents() {
-        const events = [];
-
-        return events;
-    }
-    
-    
-    createSubscribers() {
-        const subscribers = [];
-
-        return subscribers;
-    }
-    
-    
-    
-    createListeners() {
-        const listeners = [];
-
-        return listeners;
-    }
-    
     
 }
