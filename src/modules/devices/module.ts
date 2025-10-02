@@ -1,15 +1,15 @@
 import Module from "@/core/modules/module";
 import { ModuleConfig } from "@/core/modules/module";
 import { DeviceRecord } from "./schema";
-import { ControlProtocol } from "@/core/dependencies/drivers";
+import { Driver } from "@/core/dependencies/drivers";
 import AppError from "@/core/error";
 
 class DevicesModule extends Module<DeviceRecord> {
-    commandProtocol: ControlProtocol;
+    driver: Driver;
 
-    constructor(config: ModuleConfig<DeviceRecord>, commandProtocol: ControlProtocol) {
+    constructor(config: ModuleConfig<DeviceRecord>, driver: Driver) {
         super(config);
-        this.commandProtocol = commandProtocol;
+        this.driver = driver;
         this.addRoute({
             path: "/devices/:id/command",
             method: "post",
@@ -40,7 +40,7 @@ class DevicesModule extends Module<DeviceRecord> {
         if (!device.address) {
             throw new AppError(`Device ${id} has no address`);
         }
-        await this.commandProtocol.write(device.address, command);
+        await this.driver.write(device.address, command);
         await this.eventBus.emit(`device.command.sent`, { id, command });
     }
 
@@ -53,7 +53,7 @@ class DevicesModule extends Module<DeviceRecord> {
         if (!device.address) {
             throw new AppError(`Device ${id} has no address`);
         }
-        const value = await this.commandProtocol.read(device.address);
+        const value = await this.driver.read(device.address);
         await this.eventBus.emit(`device.value.read`, { id, value });
         return value;
     }
