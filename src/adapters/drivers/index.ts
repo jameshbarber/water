@@ -1,14 +1,14 @@
 import { Deps } from "@/deps";
-import { MqttControlProtocol } from "./mqtt";
-import { HttpControlProtocol } from "./http";
+import { MqttDriver } from "./mqtt";
+import { HttpDriver } from "./http";
 
-export class ControlProtocolFactory {
+export class DriverFactory {
     static create(deps: Deps, driver: string) {
         switch (driver) {
             case "mqtt":
-                return new MqttControlProtocol(deps);
+                return new MqttDriver(deps);
             case "http":
-                return new HttpControlProtocol(deps);
+                return new HttpDriver(deps);
             default:
                 throw new Error(`Driver ${driver} not supported`);
         }

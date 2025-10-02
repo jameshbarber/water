@@ -1,11 +1,11 @@
 import { Deps } from "@/deps";
-import { ControlProtocol, ControlProtocolAddress } from "@/core/dependencies/drivers";
+import { Driver, DriverAddress } from "@/core/dependencies/drivers";
 
-interface MqttAddress extends ControlProtocolAddress {
+interface MqttAddress extends DriverAddress {
     topic: string;
 }
 
-export class MqttControlProtocol extends ControlProtocol {
+export class MqttDriver extends Driver {
     private mqttClient: any;
 
     constructor(deps: Deps) {

@@ -6,7 +6,7 @@ import TriggersModule from "@/modules/triggers";
 import { triggerSchemaProvider } from "@/modules/triggers/schema";
 import DevicesModule from "./devices/module";
 import { deviceSchemaProvider } from "./devices/schema";
-import { makeControlProtocol } from "@/test/mocks";
+import { makeDriver } from "@/test/mocks";
 
 
 const deps = createDeps(manifest);
@@ -36,7 +36,7 @@ const makeDevicesModule = () =>
         store: deps.db,
         eventBus: deps.eventBus,
         schema: deviceSchemaProvider,
-    }, makeControlProtocol());
+    }, makeDriver());
 
 
 export { makeCommandsModule, makeTriggersModule, makeDevicesModule };

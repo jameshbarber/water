@@ -1,13 +1,13 @@
-import { HttpControlProtocol } from "./index";
+import { HttpDriver } from "./index";
 
-describe("HttpControlProtocol", () => {
-    let http: HttpControlProtocol;
+describe("HttpDriver", () => {
+    let http: HttpDriver;
     let mockFetch: jest.Mock;
 
     beforeEach(() => {
         mockFetch = jest.fn();
         global.fetch = mockFetch;
-        http = new HttpControlProtocol({} as any);
+        http = new HttpDriver({} as any);
     });
 
     afterEach(() => {

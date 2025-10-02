@@ -33,7 +33,7 @@ export const makeModuleConfig = () => {
   } as any;
 };
 
-export const makeControlProtocol = () => {
+export const makeDriver = () => {
   return {
     write: jest.fn(),
     read: jest.fn(),

@@ -1,14 +1,14 @@
 import { Deps } from "@/deps";
-import { ControlProtocol, ControlProtocolAddress } from "@/core/dependencies/drivers";
+import { Driver, DriverAddress } from "@/core/dependencies/drivers";
 
-interface HttpAddress extends ControlProtocolAddress {
+interface HttpAddress extends DriverAddress {
     url: string;
     method: "GET" | "POST";
     headers: Record<string, any>;
     body?: Record<string, any>;
 }
 
-export class HttpControlProtocol extends ControlProtocol {
+export class HttpDriver extends Driver {
     constructor(deps: Deps) {
         super(deps);
     }
