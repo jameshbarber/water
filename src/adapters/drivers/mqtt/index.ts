@@ -1,5 +1,5 @@
 import { Deps } from "@/deps";
-import { ControlProtocol, ControlProtocolAddress } from "@/core/dependencies/control-protocol";
+import { ControlProtocol, ControlProtocolAddress } from "@/core/dependencies/drivers";
 
 interface MqttAddress extends ControlProtocolAddress {
     topic: string;

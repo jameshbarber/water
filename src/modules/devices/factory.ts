@@ -1,6 +1,6 @@
 import type { Deps } from "@/deps";
 import type { SchemaProvider } from "@/adapters/schema/types";
-import type { ControlProtocol } from "@/core/dependencies/control-protocol";
+import type { ControlProtocol } from "@/core/dependencies/drivers";
 import DevicesModule from "./module";
 
 export const devicesModuleFactory = (

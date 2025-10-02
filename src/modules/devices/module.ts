@@ -1,7 +1,7 @@
 import Module from "@/core/modules/module";
 import { ModuleConfig } from "@/core/modules/module";
 import { DeviceRecord } from "./schema";
-import { ControlProtocol } from "@/core/dependencies/control-protocol";
+import { ControlProtocol } from "@/core/dependencies/drivers";
 import AppError from "@/core/error";
 
 class DevicesModule extends Module<DeviceRecord> {

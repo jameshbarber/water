@@ -3,7 +3,7 @@ import { AppManifest } from "./core/app";
 import App from "./core/app";
 import { deviceSchemaProvider } from "./modules/devices";
 import { devicesModuleFactory } from "./modules/devices/factory";
-import { ControlProtocol } from "./core/dependencies/control-protocol";
+import { ControlProtocol } from "./core/dependencies/drivers";
 
 export function createApp(manifest: AppManifest) {
   const deps = createDeps(manifest);
