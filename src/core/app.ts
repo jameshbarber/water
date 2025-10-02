@@ -1,44 +1,41 @@
+import z from "zod"
+import { Deps } from "@/deps";
 import { DatabaseAdapter } from "./dependencies/db";
-import express from "express";
-import { Logger } from "./dependencies/logger";
-import EventBus from "@/adapters/events";
-import Module from "./modules/module";
 
-interface ModuleConfig {
-    [key: string]: Module;
+// Simple interface for module configs based on Zod schemas
+export interface ModuleConfig {
+    [key: string]: {
+        schema: z.Schema;
+        store: DatabaseAdapter<any>;
+    };
 }
 
+// App manifest, contains the name, version, dependencies, and modules
+export interface AppManifest {
+    name: string;
+    version: string;
+    dependencies: {
+        [key: string]: string;
+    };
+    modules: ModuleConfig;
+}
+
+
+// App class, contains the name, module configs, and deps
 class App {
 
     name: string;
-    app: express.Application;
-    database: DatabaseAdapter<any>;
-    logger: Logger;
-    eventBus: EventBus;
     moduleConfigs: ModuleConfig = {};
+    deps: Deps;
 
-    constructor(name: string, database: DatabaseAdapter<any>, logger: Logger, eventBus: EventBus) {
-        this.name = name;
-        this.app = express();
-        this.database = database;
-        this.logger = logger;
-        this.eventBus = eventBus;
+    constructor(manifest: AppManifest, deps: Deps) {
+        this.name = manifest.name;
+        this.deps = deps;
     }
 
-    register(module: Module) {
-        this.moduleConfigs[module.name] = module;
+    register(name: string, schema: z.Schema, store: DatabaseAdapter<any>) {
+        this.moduleConfigs[name] = { schema, store };
     }
-
-    start() {
-        this.app.listen(3000, () => {
-            this.logger.info(`${this.name} is running on port 3000`);
-        });
-    }
-
-    getApp() {
-        return this.app;
-    }
-
 }
 
 
