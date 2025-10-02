@@ -8,7 +8,7 @@ import { JsonFileAdapter } from "./adapters/database/json";
 import SimpleEventBus from "./adapters/events";
 import { ServerAdapter } from "./core/dependencies/interfaces";
 import type { McpServerAdapter } from "./core/dependencies/interfaces/mcp";
-import NodeMcpServerAdapter from "./adapters/mcp/node";
+import NodeMcpServerAdapter from "./adapters/mcp";
 import { ExpressServerAdapter } from "./adapters/rest/express";
 import { ConsoleLogger } from "./adapters/logging/console";
 
