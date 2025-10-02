@@ -48,3 +48,11 @@ export const makeDeps = () => {
     eventBus: makeEventBus(),
   } as any;
 };
+
+export const makeLogger = () => {
+  return {
+    info: jest.fn(),
+    warn: jest.fn(),
+    error: jest.fn(),
+  } as any;
+};
