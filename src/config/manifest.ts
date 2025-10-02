@@ -13,32 +13,33 @@ const manifest = {
         "schema": "zod",
         "events": "simple"
     },
-    "modules": {
-        "readings": {
-            "store": "json",
-            "schema": "zod"
-        },
-        "settings": {
-            "store": "json",
-            "schema": "zod"
-        },
-        "sensors": {
-            "store": "json",
-            "schema": "zod"
-        },
-        "actuators": {
-            "store": "json",
-            "schema": "zod"
-        },
-        "alerts": {
-            "store": "json",
-            "schema": "zod"
-        },
-        "tokens": {
-            "store": "json",
-            "schema": "zod"
-        }
-    }
+    "modules": modules
+    // "modules": {
+    //     "readings": {
+    //         "store": "json",
+    //         "schema": "zod"
+    //     },
+    //     "settings": {
+    //         "store": "json",
+    //         "schema": "zod"
+    //     },
+    //     "sensors": {
+    //         "store": "json",
+    //         "schema": "zod"
+    //     },
+    //     "actuators": {
+    //         "store": "json",
+    //         "schema": "zod"
+    //     },
+    //     "alerts": {
+    //         "store": "json",
+    //         "schema": "zod"
+    //     },
+    //     "tokens": {
+    //         "store": "json",
+    //         "schema": "zod"
+    //     }
+    // }
 }
 
 export default manifest;
