@@ -1,13 +1,17 @@
-import { JsonFileAdapter } from "./adapters/database";
-import { NoopLogger } from "./adapters/logging/noop";
+import { createDeps } from "./deps";
+import { bindModuleFactory } from "./core/factory";
+import { AppManifest } from "./core/app";
 import App from "./core/app";
-import readings from "@/modules/readings";
-import EventBus from "./adapters/events";
 
-const db = new JsonFileAdapter("db.json");
-const logger = new NoopLogger();
-const eventBus = new EventBus();
-
-const app = new App("my-app", db, logger, eventBus);
-app.register(readings);
-app.start()
+export function createApp(manifest: AppManifest) {
+    const deps = createDeps(manifest);
+    const makeModule = bindModuleFactory(deps);
+  
+    const app = new App(manifest, deps);
+    for (const name of Object.keys(manifest.modules)) {
+      app.register(name, manifest.modules[name].schema, manifest.modules[name].store);
+      // attach routes per module here if desired
+      // app.getApp().use(`/api/${name}`, buildRouter(mod));
+    }
+    return { app, deps };
+  }
