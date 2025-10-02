@@ -3,7 +3,6 @@ import { Deps } from "@/deps";
 import { DatabaseAdapter } from "./dependencies/db";
 import Module from "./modules/module";
 
-// Declarative manifest modules (human-friendly strings)
 export interface ManifestModules {
     [key: string]: {
         schema: string;
@@ -11,7 +10,6 @@ export interface ManifestModules {
     };
 }
 
-// Resolved app module configs (actual instances)
 export interface AppModuleConfigs {
     [key: string]: {
         name: string;
@@ -20,10 +18,13 @@ export interface AppModuleConfigs {
     };
 }
 
-// App manifest, contains the name, version, dependencies, and modules
 export interface AppManifest {
     name: string;
     version: string;
+    interfaces: {
+        mcp: boolean;
+        rest: boolean;
+    };
     dependencies: {
         [key: string]: string;
     };
@@ -31,9 +32,9 @@ export interface AppManifest {
 }
 
 
-// App class, contains the name, module configs, and deps
 class App {
 
+    manifest: AppManifest;
     name: string;
     moduleConfigs: AppModuleConfigs = {};
     deps: Deps;
@@ -41,6 +42,7 @@ class App {
     constructor(manifest: AppManifest, deps: Deps) {
         this.name = manifest.name;
         this.deps = deps;
+        this.manifest = manifest;
     }
 
     register<T extends { id: string }>(module: Module<T>) {
@@ -103,8 +105,12 @@ class App {
     }
 
     start() {
-        this.deps.rest?.start();
-        this.deps.mcp?.start();
+        if (this.manifest.interfaces?.rest) {
+            this.deps.rest?.start();
+        }
+        if (this.manifest.interfaces?.mcp) {
+            this.deps.mcp?.start();
+        }
     }
 }
 

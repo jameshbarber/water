@@ -1,6 +1,10 @@
 const manifest = {
     "name": "water",
     "version": "1.0.0",
+    "interfaces": {
+        "mcp": true, 
+        "rest": true
+    },
     "dependencies": {
         "db": "json",
         "schema": "zod",
