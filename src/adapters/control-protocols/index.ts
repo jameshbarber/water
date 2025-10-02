@@ -1,19 +1,16 @@
-import { ControlProtocolAddress } from "@/core/dependencies/control-protocol";
 import { Deps } from "@/deps";
+import { MqttControlProtocol } from "./mqtt";
+import { HttpControlProtocol } from "./http";
 
-export class MqttControlProtocol {
-    
-    deps: Deps;
-
-    constructor(deps: Deps) {
-        this.deps = deps;
-    }
-
-    read(address: ControlProtocolAddress): Promise<any> {
-        throw new Error("Not implemented");
-    }
-
-    write(address: ControlProtocolAddress, data: any): Promise<any> {
-        throw new Error("Not implemented");
+export class ControlProtocolFactory {
+    static create(deps: Deps, driver: string) {
+        switch (driver) {
+            case "mqtt":
+                return new MqttControlProtocol(deps);
+            case "http":
+                return new HttpControlProtocol(deps);
+            default:
+                throw new Error(`Driver ${driver} not supported`);
+        }
     }
 }
