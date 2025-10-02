@@ -3,20 +3,20 @@
 // It defines read and write methods, which are used by actuators and sensors.
 import { Deps } from "@/deps";
 
-export type ControlProtocolAddress = Record<string, any>;
+export type DriverAddress = Record<string, any>;
 
-export class ControlProtocol {
+export class Driver {
     deps: Deps;
 
     constructor(deps: Deps) {
         this.deps = deps;
     }
 
-    read(address: ControlProtocolAddress): Promise<any> {
+    read(address: DriverAddress): Promise<any> {
         throw new Error("Not implemented");
     }
 
-    write(address: ControlProtocolAddress, data: any): Promise<any> {
+    write(address: DriverAddress, data: any): Promise<any> {
         throw new Error("Not implemented");
     }
 }
