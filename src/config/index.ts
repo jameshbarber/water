@@ -16,5 +16,5 @@ export const EventBus = SimpleEventBus;
 
 // Export instances for use in other files
 export const logger = new Logger();
-export const database = new Database("db.json");
-export const eventBus = new EventBus();
+export const database = new Database("db.json", logger);
+export const eventBus = new EventBus(logger);
