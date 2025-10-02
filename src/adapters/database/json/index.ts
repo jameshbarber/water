@@ -3,15 +3,18 @@ import fs from "fs";
 import path from "path";
 import { DatabaseAdapter, Where } from "@/core/dependencies/db";
 import { randomUUID } from "crypto";
+import { Logger } from "@/core/dependencies/logger";
 
 
 type JsonStore<T> = { items: T[] };
 
-export class JsonFileAdapter<T extends { id: string | number }> implements DatabaseAdapter<T> {
+export class JsonFileAdapter<T extends { id: string }> implements DatabaseAdapter<T> {
     private filePath: string;
+    private logger: Logger;
 
-    constructor(filePath: string) {
+    constructor(filePath: string, logger: Logger) {
         this.filePath = filePath;
+        this.logger = logger;
         this.ensureFile();
     }
 
@@ -77,3 +80,4 @@ export class JsonFileAdapter<T extends { id: string | number }> implements Datab
         return removed ?? null;
     }
 }
+

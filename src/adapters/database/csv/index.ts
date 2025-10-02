@@ -3,13 +3,16 @@ import fs from "fs";
 import path from "path";
 import { DatabaseAdapter, Where } from "@/core/dependencies/db";
 import { randomUUID } from "crypto";
+import { Logger } from "@/core/dependencies/logger";
 
-export class CsvFileAdapter<T extends { id: string | number }> implements DatabaseAdapter<T> {
+export class CsvFileAdapter<T extends { id: string }> implements DatabaseAdapter<T> {
     private filePath: string;
     private headers: string[];
+    private logger: Logger;
 
-    constructor(filePath: string, headers?: (keyof T)[]) {
+    constructor(filePath: string, logger: Logger, headers?: (keyof T)[]) {
         this.filePath = filePath;
+        this.logger = logger;
         const dir = path.dirname(this.filePath);
         if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
 
