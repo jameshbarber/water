@@ -12,6 +12,7 @@
   "license": "ISC",
   "packageManager": "pnpm@9.12.2+sha512.22721b3a11f81661ae1ec68ce1a7b879425a1ca5b991c975b074ac220b187ce56c708fe5db69f4c962c989452eee76c82877f4ee80f474cebd61ee13461b6228",
   "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.19.1",
     "dotenv": "^17.2.3",
     "drizzle-zod": "^0.8.3",
     "express": "^5.1.0",
