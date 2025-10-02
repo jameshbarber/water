@@ -2,12 +2,15 @@ import { DatabaseAdapter, Where } from "@/core/dependencies/db";
 import { SchemaProvider } from "@/adapters/schema/types";
 import { EventBus } from "@/core/dependencies/events";
 import AppError from "../error";
+import App from "../app";
+import { RouteInterface } from "../dependencies/interfaces/rest";
 
 export interface ModuleConfig<T extends { id: string }> {
     name: string;
     store: DatabaseAdapter<T>;
     eventBus: EventBus;
     schema: SchemaProvider;
+    app?: App;   
 }
 
 export default class Module<T extends { id: string }> {
@@ -16,12 +19,14 @@ export default class Module<T extends { id: string }> {
     store: DatabaseAdapter<T>;
     eventBus: EventBus;
     schema: SchemaProvider;
+    app?: App;
     
     constructor(config: ModuleConfig<T>) {
         this.store = config.store;
         this.name = config.name;
         this.eventBus = config.eventBus;
         this.schema = config.schema;
+        this.app = config.app;
     }
 
     async findOne(id: string): Promise<T> {
@@ -29,7 +34,7 @@ export default class Module<T extends { id: string }> {
             where: { id } as Where<T>
         })
         if (!result) {
-            throw new AppError(`${this.name} ${id} not found`); 
+            throw new AppError(`${this.name} ${id} not found`, 404, `${this.name}.not_found`); 
         }
         return result;
     }
@@ -54,15 +59,24 @@ export default class Module<T extends { id: string }> {
             where: { id } as Where<T>,
             data: data
         })
-        if (val) {
-            this.eventBus.emit(`${this.name}.updated`, val);
+        if (!val) {
+            throw new AppError(`${this.name} ${id} not found`, 404, `${this.name}.not_found`);
         }
+        this.eventBus.emit(`${this.name}.updated`, val);
         return val;
     }
 
     async delete(id: string): Promise<T | null> {
-        return this.store.delete({
+        const val = await this.store.delete({
             where: { id } as Where<T>
         })
+        if (!val) {
+            throw new AppError(`${this.name} ${id} not found`, 404, `${this.name}.not_found`);
+        }
+        return val;
+    }
+
+    addRoute(route: RouteInterface) {
+        this.app?.deps.rest?.use(route);
     }
 }

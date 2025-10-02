@@ -12,3 +12,24 @@ Water makes it effortless to facilitate the control of & collection of readings 
 - Typed API accessible over local network
 - MCP Server accessible over local network
 - Tools SDK (?)
+
+## Code Architecture 
+This codebase works with the concept of an `App` which is initialised using a `manifest.ts` file containing JSON specs. `Modules` are core CRUD entities, stored in a `Store` of your choice. 
+
+## Storage
+You can store data in pretty much any form using the adapter pattern, and customise this per module. Built in support for local storage in the form of JSON & CSV files, as well as remote storage in the form of POSTGRES and TimescaleDB. 
+
+## Control Protocols
+You can use pretty much any protocol to integrate devices such as sensors and actuators. Out-the-box support for MQTT, GPIO (via polling) & HTTP. 
+
+## Interfaces
+You can access the hub over pretty much any interface. Out-the-box support for REST & MCP servers, as well as a typed API client. 
+
+
+# Stack
+- NodeJS + Typescript
+- Jest
+- Express
+- OpenAPI Typescript
+
+

@@ -1,0 +1,1 @@
+{"items":[{"id":"1","name":"alpha"},{"id":"2","name":"beta"},{"id":"3","name":"gamma"},{"role":"sensor","driver":"http","address":{"url":"http://sensor.local"},"id":"95a4d611-4f15-4c36-8da7-2dc96218aeb4"}]}

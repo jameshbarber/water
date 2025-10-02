@@ -1,6 +1,6 @@
 import { JsonFileAdapter } from "@/adapters/database";
-import { NoopLogger } from "@/adapters/logging/noop";
 import SimpleEventBus from "@/adapters/events";
+import { ConsoleLogger } from "@/adapters/logging/console";
 
 // Poor-man's dependency injection
 // Problems with this:
@@ -10,7 +10,7 @@ import SimpleEventBus from "@/adapters/events";
 // - Difficult to extend
 // - Difficult to reuse
 
-export const Logger = NoopLogger;
+export const Logger = ConsoleLogger;
 export const Database = JsonFileAdapter;
 export const EventBus = SimpleEventBus;
 

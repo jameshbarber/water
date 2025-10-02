@@ -1,6 +1,6 @@
 import Module from "@/core/modules/module";
 import { ModuleConfig } from "@/core/modules/module";
-import { DeviceRecord } from "./index";
+import { DeviceRecord } from "./schema";
 import { ControlProtocol } from "@/core/dependencies/control-protocol";
 import AppError from "@/core/error";
 
@@ -10,7 +10,25 @@ class DevicesModule extends Module<DeviceRecord> {
     constructor(config: ModuleConfig<DeviceRecord>, commandProtocol: ControlProtocol) {
         super(config);
         this.commandProtocol = commandProtocol;
-
+        this.addRoute({
+            path: "/devices/:id/command",
+            method: "post",
+            summary: "Send a command to a device",
+            description: "Send a command to a device",
+            handler: async (req: any, res: any) => {
+                await this.sendCommand(req.params.id, req.body.command);
+                return res.json({ message: "Command sent" });
+            },
+        });
+        this.addRoute({
+            path: "/devices/:id/value",
+            method: "get",
+            summary: "Read a value from a device",
+            description: "Read a value from a device",
+            handler: async (req: any, res: any) => {
+                await this.readValue(req.params.id);
+            },
+        });
     }
 
     async sendCommand(id: string, command: string) {

@@ -1,12 +1,6 @@
-import express, { Request, Response } from "express";
+import { createApp } from "./src/index";
+import manifest from "./src/config/manifest";
 
-const app = express();
-const PORT = process.env.PORT || 4000;
+const {app} = createApp(manifest);
 
-app.get("/", (req: Request, res: Response) => {
-  res.send("Hello TypeScript + Express 👋");
-});
-
-app.listen(PORT, () => {
-  console.log(`🚀 Server is running at http://localhost:${PORT}`);
-});
+app.start();

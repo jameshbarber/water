@@ -1,11 +1,6 @@
-import Module from "@/core/modules/module";
-import { ModuleConfig } from "@/core/modules/module";
-import { CommandRecord } from "./schema";
-
-class CommandsModule extends Module<CommandRecord> {
-    constructor(config: ModuleConfig<CommandRecord>) {
-        super(config);
-    }
-}
-
+import { commandSchemaProvider, commandSchema } from "./schema";
+import CommandsModule from "./module";
 export default CommandsModule;  
+
+export { CommandsModule };
+export { commandSchemaProvider, commandSchema };

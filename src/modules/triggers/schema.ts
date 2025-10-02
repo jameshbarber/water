@@ -1,7 +1,7 @@
 import { ZodSchemaProvider } from "@/adapters/schema";
 import { z } from "zod";
 
-const schema = new ZodSchemaProvider();
+const triggerSchemaProvider = new ZodSchemaProvider();
 
 const triggerSchema = z.object({
     id: z.string(),
@@ -10,6 +10,7 @@ const triggerSchema = z.object({
     type: z.enum(["cron", "value"]),
     cron: z.string().optional(),
     value: z.string().optional(),
+    operation: z.enum([">", "<", "==", "!=", ">=", "<="]),
     deviceId: z.string(),
     commandId: z.string(),
 }).superRefine((data, ctx) => {
@@ -21,11 +22,11 @@ const triggerSchema = z.object({
     }
 });
 
-schema.create("triggers", {
+triggerSchemaProvider.create("triggers", {
     create: triggerSchema,
     read: triggerSchema,
     query: triggerSchema,
 });
 
 export type TriggerRecord = z.infer<typeof triggerSchema>;
-export default schema;
+export { triggerSchemaProvider, triggerSchema };

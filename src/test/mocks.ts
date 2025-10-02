@@ -41,3 +41,10 @@ export const makeControlProtocol = () => {
 };
 
 
+
+export const makeDeps = () => {
+  return {
+    db: makeDbSchema(),
+    eventBus: makeEventBus(),
+  } as any;
+};
