@@ -2,7 +2,7 @@ import { AppInterface } from "../types";
 import type { Deps } from "@/deps";
 import { McpServerAdapter, McpTool } from "./types";
 
-export class McpInterface extends AppInterface {
+class McpInterface extends AppInterface {
     server: McpServerAdapter;
     deps: Deps;
 
@@ -21,4 +21,4 @@ export class McpInterface extends AppInterface {
     }
 }
 
-export type { Deps };
+export { Deps, McpInterface, McpServerAdapter, McpTool };
