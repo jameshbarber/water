@@ -7,15 +7,3 @@ export interface DatabaseAdapter<T> {
     update(args: { where: Where<T>; data: Partial<T> }): Promise<T | null>;
     delete(args: { where: Where<T> }): Promise<T | null>;
 }
-
-// Generic I/O schema provider
-export interface EntitySchema<TCreate, TRead, TQuery> {
-    create: import("zod").ZodType<TCreate>;
-    read: import("zod").ZodType<TRead>;
-    query?: import("zod").ZodType<TQuery>;
-}
-
-export interface SchemaProvider {
-    getEntitySchema(entityName: string): EntitySchema<any, any, any> | undefined;
-    listEntities(): string[];
-}

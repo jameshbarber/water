@@ -1,3 +1,26 @@
+import { ZodSchemaProvider } from "@/adapters/schema";
+import { z } from "zod";
+
+describe("ZodSchemaProvider", () => {
+    it("registers and retrieves schemas", () => {
+        const provider = new ZodSchemaProvider();
+
+        const create = z.object({
+            id: z.string().uuid().optional(),
+            name: z.string(),
+            age: z.number().int().min(0)
+        });
+
+        provider.create("user", { create });
+
+        const schema = provider.getSchema("user");
+        expect(schema).toBeDefined();
+        expect(() => schema!.create.parse({ name: "A", age: 1 })).not.toThrow();
+        expect(() => schema!.read.parse({ id: "x", name: "A", age: 1 })).not.toThrow();
+        expect(provider.listSchemas()).toEqual(["user"]);
+    });
+});
+
 import fs from "fs";
 import path from "path";
 import { JsonFileAdapter } from "./index";

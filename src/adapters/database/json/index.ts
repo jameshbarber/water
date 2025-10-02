@@ -1,7 +1,7 @@
 // Database adapter interfaces and JSON-file-backed default implementation
 import fs from "fs";
 import path from "path";
-import { DatabaseAdapter, Where } from "@/lib/database/types";
+import { DatabaseAdapter, Where } from "@/core/dependencies/db";
 import { randomUUID } from "crypto";
 
 
