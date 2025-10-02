@@ -1,4 +1,4 @@
-import { ZodSchemaProvider } from "@/adapters/database";
+import { ZodSchemaProvider } from "@/adapters/schema";
 import { z } from "zod";
 
 const schema = new ZodSchemaProvider();
