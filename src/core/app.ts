@@ -103,8 +103,8 @@ class App {
     }
 
     start() {
-        // Activate rest interface
         this.deps.rest?.start();
+        this.deps.mcp?.start();
     }
 }
 
