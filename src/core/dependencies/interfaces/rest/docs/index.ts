@@ -1,5 +1,5 @@
 import type { OpenAPI3 } from "openapi-typescript";
-import type { RouteInterface } from "./index";
+import type { RouteInterface } from "../index";
 
 class DocumentGenerator {
     name: string;
