@@ -1,5 +1,5 @@
-import { RouteInterface } from "./routes";
+import { RouteInterface } from "./server/routes";
 import { ServerAdapter } from "./server";
-import { DocumentGenerator } from "./doc-generator";
+import { DocumentGenerator } from "./docs";
 
 export { RouteInterface, ServerAdapter, DocumentGenerator };
