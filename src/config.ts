@@ -23,8 +23,8 @@ const manifest: AppManifest = {
         }
     },
     "store": {
-        "type": "drizzle", 
-        "url": process.env.DATABASE_URL as string
+        "type": "json",
+        "url": "data.json"
     },
     "modules": {
         "commands": {
@@ -46,7 +46,7 @@ const manifest: AppManifest = {
             "schema": readingsSchemaProvider, 
             "buffer": {
                 "enabled": true,
-                "intervalMs": 1000
+                "maxItems": 100
             },
             "constructor": ReadingsModule
         },
