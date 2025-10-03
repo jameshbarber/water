@@ -9,10 +9,12 @@ export class CsvFileAdapter<T extends { id: string }> implements DatabaseAdapter
     private filePath: string;
     private headers: string[];
     private logger: Logger;
+    table: string;
 
-    constructor(filePath: string, logger: Logger, headers?: (keyof T)[]) {
+    constructor(filePath: string, logger: Logger, table: string, headers?: (keyof T)[]) {
         this.filePath = filePath;
         this.logger = logger;
+        this.table = table;
         const dir = path.dirname(this.filePath);
         if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
 
@@ -26,6 +28,10 @@ export class CsvFileAdapter<T extends { id: string }> implements DatabaseAdapter
             this.headers = headers?.map(String) ?? ["id"];
             fs.writeFileSync(this.filePath, this.headers.join(",") + "\n");
         }
+    }
+
+    async initialize(): Promise<void> {
+        return;
     }
 
     private readAll(): T[] {

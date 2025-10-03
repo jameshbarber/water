@@ -11,11 +11,18 @@ type JsonStore<T> = { items: T[] };
 export class JsonFileAdapter<T extends { id: string }> implements DatabaseAdapter<T> {
     private filePath: string;
     private logger: Logger;
+    table: string;
 
-    constructor(filePath: string, logger: Logger) {
+    constructor(filePath: string, logger: Logger, table: string) {
         this.filePath = filePath;
         this.logger = logger;
         this.ensureFile();
+        this.table = table;
+    }
+
+
+    async initialize(): Promise<void> {
+        return;
     }
 
     private ensureFile() {
