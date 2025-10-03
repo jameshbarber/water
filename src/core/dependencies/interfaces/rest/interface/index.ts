@@ -14,7 +14,7 @@ export class RestInterface extends AppInterface {
     }
 
     registerRoute(route: Route) {
-        this.server.use(route);
+        this.server.createRoute(route);
     }
 
     initialize() {

@@ -83,6 +83,6 @@ export default class Module<T extends { id: string }> {
     }
 
     addRoute(route: Route) {
-        this.app?.deps.rest?.use(route);
+        this.app?.deps.rest?.createRoute(route);
     }
 }

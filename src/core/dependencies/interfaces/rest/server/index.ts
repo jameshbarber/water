@@ -6,5 +6,5 @@ export interface ServerAdapter {
     createRoute(route: Route): void;
     createRoutes(routes: Route[]): void;
     getRoutes(): Route[];
-    start(port: number, host: string): void;
+    start(port?: number, host?: string): void;
 }

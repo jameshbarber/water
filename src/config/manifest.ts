@@ -2,8 +2,14 @@ const manifest = {
     "name": "water",
     "version": "1.0.0",
     "interfaces": {
-        "mcp": true, 
-        "rest": true
+        "mcp": {
+            "enabled": false,
+        },
+        "rest": {
+            "enabled": true,
+            "port": 3000,
+            "host": "0.0.0.0"
+        }
     },
     "dependencies": {
         "db": "json",
