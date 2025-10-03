@@ -1,12 +1,10 @@
 import { Deps } from "@/deps";
 import CommandsModule from "./module";
-import { commandSchemaProvider } from "./schema";
+import { CommandRecord } from "./schema";
+import { ModuleConfig } from "@/core/modules";
 
-const commandsModuleFactory = (deps: Deps) => {
-        return () => {
-        const module = new CommandsModule({name: "commands", store: deps.db, eventBus: deps.eventBus, schema: commandSchemaProvider, logger: deps.logger});
-        return module;
-    }
+const commandsModuleFactory = (deps: Deps, config: ModuleConfig<CommandRecord>) => {
+    return new CommandsModule(config, deps);
 }
 
 export default commandsModuleFactory;
