@@ -15,7 +15,7 @@ export function createApp(manifest: AppManifest) {
   app.register(devicesModuleFactory(deps, deviceSchemaProvider, new Driver(deps))());
   app.register(triggersModuleFactory(deps, triggerSchemaProvider)());
 
-  createSubscribers(deps.eventBus);
+  createSubscribers(deps);
 
   return { app, deps };
 }
