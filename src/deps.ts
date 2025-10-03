@@ -2,17 +2,10 @@
 import { Logger } from "./core/dependencies/logger";
 import { EventBus } from "./core/dependencies/events";
 import { AppManifest, StoreConfiguration } from "./core/app";
-import SimpleEventBus from "./adapters/events";
-import { ServerAdapter } from "./core/dependencies/interfaces";
-import type { McpServerAdapter } from "./core/dependencies/interfaces/mcp";
-import McpHttpAdapter from "./adapters/mcp/http";
-import { ExpressServerAdapter } from "./adapters/rest/express";
-import { ConsoleLogger } from "./adapters/logging/console";
-import { Database } from "./core/dependencies/db";
-import { DrizzleDatabase } from "./adapters/database/drizzle";
-import { JsonDatabase } from "./adapters/database/json";
-import { CsvDatabase } from "./adapters/database/csv";
-import { PostgresDatabase } from "./adapters/database/postgres";
+import {SimpleEventBus, ConsoleLogger, OpenAPIDocGenerator, McpServer, ExpressServerAdapter} from "./adapters";
+import { ServerAdapter } from "./core/dependencies";
+import { Database, DocumentGenerator, McpServerAdapter } from "./core/dependencies";
+import { DrizzleDatabase, JsonDatabase, CsvDatabase, PostgresDatabase } from "./adapters/database";
 
 export type Deps = {
   logger: Logger;
@@ -21,8 +14,8 @@ export type Deps = {
   mcp?: McpServerAdapter;
   database: Database;
   driver?: any;
+  docs?: DocumentGenerator
 };
-
 
 export function createDeps(manifest: AppManifest): Deps {
 
@@ -47,8 +40,8 @@ export function createDeps(manifest: AppManifest): Deps {
   const database = createDatabase(manifest.store ?? { type: "json", url: "data.json" });
 
   const rest = new ExpressServerAdapter({ logger, eventBus, database });
-  const mcp = new McpHttpAdapter({ logger, eventBus, database }, rest, manifest.name, manifest.version);
+  const mcp = new McpServer({ logger, eventBus, database }, manifest.name, manifest.version);
 
-
-  return { logger, eventBus, rest, mcp, database };
+  const docs = new OpenAPIDocGenerator();
+  return { logger, eventBus, rest, mcp, database, docs };
 }
