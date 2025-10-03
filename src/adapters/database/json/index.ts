@@ -1,14 +1,14 @@
 // Database adapter interfaces and JSON-file-backed default implementation
 import fs from "fs";
 import path from "path";
-import { DatabaseAdapter, Where } from "@/core/dependencies/db";
+import { Database, Store, Where } from "@/core/dependencies/db";
 import { randomUUID } from "crypto";
 import { Logger } from "@/core/dependencies/logger";
 
 
 type JsonStore<T> = { items: T[] };
 
-export class JsonFileAdapter<T extends { id: string }> implements DatabaseAdapter<T> {
+export class JsonFileAdapter<T extends { id?: string }> implements Store<T> {
     private filePath: string;
     private logger: Logger;
     table: string;
@@ -85,6 +85,19 @@ export class JsonFileAdapter<T extends { id: string }> implements DatabaseAdapte
         const [removed] = store.items.splice(idx, 1);
         this.write(store);
         return removed ?? null;
+    }
+}
+
+export class JsonDatabase implements Database {
+    private filePath: string;
+    private logger: Logger;
+    constructor(filePath: string, logger: Logger) {
+        this.filePath = filePath;
+        this.logger = logger;
+    }
+    async initialize(): Promise<void> { return; }
+    repo<T extends { id?: string }>(tableName: string): Store<T> {
+        return new JsonFileAdapter<T>(this.filePath, this.logger, tableName);
     }
 }
 

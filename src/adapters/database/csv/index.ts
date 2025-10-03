@@ -1,11 +1,11 @@
 // Database adapter interfaces and JSON-file-backed default implementation
 import fs from "fs";
 import path from "path";
-import { DatabaseAdapter, Where } from "@/core/dependencies/db";
+import { Database, Store, Where } from "@/core/dependencies/db";
 import { randomUUID } from "crypto";
 import { Logger } from "@/core/dependencies/logger";
 
-export class CsvFileAdapter<T extends { id: string }> implements DatabaseAdapter<T> {
+export class CsvFileAdapter<T extends { id?: string }> implements Store<T> {
     private filePath: string;
     private headers: string[];
     private logger: Logger;
@@ -104,5 +104,19 @@ export class CsvFileAdapter<T extends { id: string }> implements DatabaseAdapter
         const [removed] = items.splice(idx, 1);
         this.writeAll(items);
         return removed ?? null;
+    }
+}
+
+export class CsvDatabase implements Database {
+    private dir: string;
+    private logger: Logger;
+    constructor(dir: string, logger: Logger) {
+        this.dir = dir;
+        this.logger = logger;
+    }
+    async initialize(): Promise<void> { return; }
+    repo<T extends { id?: string }>(tableName: string): Store<T> {
+        const filePath = path.join(this.dir, `${tableName}.csv`);
+        return new CsvFileAdapter<T>(filePath, this.logger, tableName);
     }
 }
