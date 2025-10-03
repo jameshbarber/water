@@ -5,8 +5,9 @@ describe("McpServer", () => {
     const mockDeps = {
         schema: makeDbSchema(),
         eventBus: makeEventBus(),
-        db: makeDbSchema(),
-        logger: makeLogger()
+        database: makeDbSchema(),
+        logger: makeLogger(),
+        makeModuleDataStore: jest.fn()
     };
 
     const mockTool = {
