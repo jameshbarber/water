@@ -32,3 +32,22 @@ You can access the hub over pretty much any interface. Out-the-box support for R
 - OpenAPI Typescript
 
 
+# Understanding this project
+- `src` contains all application code
+    - `adapters` contains implementations of dependencies, e.g `JSONDatabaseAdapter` for local JSON storage
+        - `database` contains storage adapters, JSON+CSV by default.
+        - `drivers` contains communication protocol drivers, MQTT+HTTPS by default
+        - `logging` contains logger implementations, NOOP and console by default.
+        - `rest` contains an express server implementation of a rest interface
+        - `schema` contains `SchemaProvider` implementations, which depend on the database adapter used.
+    - `core` contains the interfaces & base classes that you can extend or implement to create adapter instances
+        - `dependencies`
+        - `error`
+        - `modules` base module with CRUD & event emittence, to be extended if needed
+    - `modules` contains business logic for relevant zod-schema driven modules. Basic CRUD operations are supported by default via the database adapter. 
+    - `subscribers` contains all listeners for the event bus events
+    - `test` contains all testing mocks
+    - `deps` contains code to configure and inject dependencies
+    - `index.ts` creates the app instance
+    - `manifest.ts` contains the app manifest, and wires in the module schemas. 
+
