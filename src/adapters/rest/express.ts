@@ -4,6 +4,7 @@ import Module from "@/core/modules";
 import { Deps } from "@/deps";
 import express, { Express } from "express";
 import { createCrudRoutes } from "./router";
+import { OpenAPI3, PathsObject } from "openapi-typescript";
 
 export class ExpressServerAdapter implements ServerAdapter {
     server?: Express;
@@ -54,14 +55,27 @@ export class ExpressServerAdapter implements ServerAdapter {
         return [...this.routes];
     }
 
-    generateOpenAPISpec() {
-        return this.routes.map(r => {
-            return {
-                path: r.path,
-                method: r.method,
-                description: r.description,
-            };
-        });
+    getOpenAPISchema(): OpenAPI3 {
+        return {
+            openapi: "3.0.0",
+            info: {
+                title: "API",
+                version: "1.0.0"
+            },
+            paths: this.routes.reduce((acc, r) => {
+                const pathItem: any = acc[r.path] || {};
+                pathItem[r.method] = {
+                    summary: r.summary,
+                    description: r.description,
+                    responses: {
+                        200: { description: "OK" }
+                    }
+                };
+                acc[r.path] = pathItem;
+                return acc;
+            }, {} as PathsObject),
+            components: { schemas: {} }
+        };
     }
 
     start(port?: number, host?: string) {
