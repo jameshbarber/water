@@ -49,6 +49,35 @@ Water is a lightweight hub for controlling devices and collecting readings on a 
     - `pnpm drizzle:migrate`
     - `pnpm drizzle:studio`
 
+#### DATABASE_URL in .env
+- **Required when using `drizzle`** (runtime client and Drizzle tooling read `DATABASE_URL`).
+- **Recommended for `postgres`**: set `manifest.store.url` to `process.env.DATABASE_URL` in `src/config.ts`.
+
+Add an `.env` file at the repo root:
+
+```env
+# Local example (no SSL)
+DATABASE_URL=postgresql://postgres:postgres@localhost:5432/water
+
+# If your provider requires SSL, append a mode parameter (provider-specific):
+# DATABASE_URL=postgresql://USER:PASS@HOST:5432/DB?sslmode=require
+```
+
+If you use the `postgres` store type instead of `drizzle`, point the store to the same env var:
+
+```ts
+// src/config.ts
+"store": {
+  "type": "postgres",
+  "url": process.env.DATABASE_URL as string
+}
+```
+
+Notes:
+- Protocol may be `postgres://` or `postgresql://`.
+- Ensure the database (`water` above) exists before running migrations.
+- Drizzle CLI uses the same `DATABASE_URL` defined in `drizzle.config.ts`.
+
 ### Running locally
 1. Install deps: `pnpm install`
 2. Configure `src/config.ts`:
