@@ -22,7 +22,7 @@ export default class Module<T extends { id: string }> {
     eventBus: EventBus;
     schema: SchemaProvider;
     app?: App;
-    logger: Logger;
+    logger?: Logger;
     
     constructor(config: ModuleConfig<T>) {
         this.store = config.store;
@@ -53,7 +53,7 @@ export default class Module<T extends { id: string }> {
         const val = await this.store.create({
             data: data
         })
-        this.logger.debug(`Emitting event: ${this.name}.created ${JSON.stringify(val)}`);
+        this.logger?.debug(`Emitting event: ${this.name}.created ${JSON.stringify(val)}`);
         this.eventBus.emit(`${this.name}.created`, val);
         return val;
     }
