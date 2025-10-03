@@ -1,5 +1,5 @@
 import { createDeps } from "@/deps";
-import manifest from "@/manifest";
+import manifest from "@/config";
 import CommandsModule from "@/modules/commands";
 import { commandSchemaProvider } from "@/modules/commands/schema";
 import TriggersModule from "@/modules/triggers";
