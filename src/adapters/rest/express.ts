@@ -1,4 +1,5 @@
 import { ServerAdapter, Route, DocumentGenerator } from "@/core/dependencies/interfaces";
+import { OpenAPIDocGenerator } from "./docs";
 import Module from "@/core/modules";
 import { Deps } from "@/deps";
 import express, { Express } from "express";
@@ -10,20 +11,20 @@ export class ExpressServerAdapter implements ServerAdapter {
     server?: Express;
     deps: Deps;
     private routes: Route[] = [];
-    private docs?: DocumentGenerator;
+    private docs: DocumentGenerator;
 
     constructor(deps: Deps) {
         this.deps = deps;
         this.server = express();
         this.server.use(express.json());
-        this.docs = deps.docs;
+        this.docs = deps.docs ?? new OpenAPIDocGenerator();
     }
 
     register(module: Module<any>) {
         const moduleSchemaProvider = module.schemas;
-        const schema = moduleSchemaProvider?.getSchema?.(module.name);
+        const schema = moduleSchemaProvider?.getSchema?.();
         this.deps.logger?.info(`Registering module ${module.name} with schemas ${JSON.stringify(schema)}`);
-        this.docs?.registerModule(module);
+        this.docs.registerModule(module);
         this.createRoutes(createCrudRoutes(module));
     }
 
@@ -59,14 +60,12 @@ export class ExpressServerAdapter implements ServerAdapter {
     }
 
     generateDocs(): any {
-        if (!this.docs) throw new AppError("Docs not found");
-        return this.docs?.generate(this.routes);
+        return this.docs.generate(this.routes);
     }
 
     serveDocs() {
         this.server?.get("/docs/rest", (req: any, res: any) => {
-            const schema = this.docs?.generate(this.routes);
-            if (!schema) throw new AppError("Docs not found");
+            const schema = this.docs.generate(this.routes);
             res.json(schema);
         });
     }
