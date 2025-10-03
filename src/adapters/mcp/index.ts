@@ -49,6 +49,5 @@ export class McpServer implements McpServerAdapter {
     }
 }
 
-export default McpServer;
 
 
