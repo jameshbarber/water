@@ -1,7 +1,7 @@
-import { Database, Store, Where } from "@/core/dependencies/db";
+import { Database, Repository, Where } from "@/core/dependencies/db";
 import { Pool } from "pg";
 
-class PgStore<T extends { id?: string }> implements Store<T> {
+class PgRepository<T extends { id?: string }> implements Repository<T> {
     table: string;
     private pool: Pool;
 
@@ -72,9 +72,9 @@ export class PostgresDatabase implements Database {
 
     async initialize(): Promise<void> { return; }
 
-    repo<T extends { id?: string }>(source: any, tableName?: string): Store<T> {
+    repo<T extends { id?: string }>(source: any, tableName?: string): Repository<T> {
         const table = (source && (source as any)._.name) || tableName || String(source);
-        return new PgStore<T>(this.pool, table);
+        return new PgRepository<T>(this.pool, table);
     }
 }
 

@@ -1,12 +1,12 @@
-import { Store, Where } from "@/core/dependencies/db";
+import { Repository, Where } from "@/core/dependencies/db";
 import { db } from "./client";
 import { AnyPgTable } from "drizzle-orm/pg-core";
 import { and, eq, InferInsertModel, InferSelectModel, SQL } from "drizzle-orm";
 
 type RowOf<TTable extends AnyPgTable> = InferSelectModel<TTable> & { id?: string };
 
-export class DrizzleDataStore<TTable extends AnyPgTable>
-  implements Store<RowOf<TTable>> {
+export class DrizzleRepository<TTable extends AnyPgTable>
+  implements Repository<RowOf<TTable>> {
   table: string;
   private schema: TTable;
 
@@ -76,7 +76,7 @@ export class DrizzleDataStore<TTable extends AnyPgTable>
 
 export class DrizzleDatabase {
   async initialize(): Promise<void> { return; }
-  repo<T extends { id: string }, TTable extends AnyPgTable>(schema: TTable, tableName?: string): Store<T> {
-    return new DrizzleDataStore(tableName ?? (schema as any)._.name as string, schema) as unknown as Store<T>;
+  repo<T extends { id: string }, TTable extends AnyPgTable>(schema: TTable, tableName?: string): Repository<T> {
+    return new DrizzleRepository(tableName ?? (schema as any)._.name as string, schema) as unknown as Repository<T>;
   }
 }

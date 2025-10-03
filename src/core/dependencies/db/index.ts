@@ -1,6 +1,6 @@
 export type Where<T> = Partial<T>;
 
-export interface Store<T extends { id?: string }> {
+export interface Repository<T extends { id?: string }> {
     table: string;
     initialize(): Promise<void>;
     findOne(args: { where: Where<T> }): Promise<T | null>;
@@ -10,7 +10,10 @@ export interface Store<T extends { id?: string }> {
     delete(args: { where: Where<T> }): Promise<T | null>;
 }
 
+export type Store<T extends { id?: string }> = Repository<T>;
+
 export interface Database {
     initialize(): Promise<void>;
-    repo<T extends { id: string }>(source: any, tableName?: string): Store<T>;
+    repo<T extends { id: string }>(source: any, tableName?: string): Repository<T>;
+    repository?<T extends { id: string }>(source: any, tableName?: string): Repository<T>;
 }
