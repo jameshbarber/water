@@ -1,15 +1,13 @@
 import Module from "@/core/modules";
 import { ModuleConfig } from "@/core/modules";
 import { DeviceRecord } from "./schema";
-import { Driver } from "@/core/dependencies/drivers";
 import AppError from "@/core/error";
+import { Deps } from "@/deps";
 
 class DevicesModule extends Module<DeviceRecord> {
-    driver: Driver;
 
-    constructor(config: ModuleConfig<DeviceRecord>, driver: Driver) {
-        super(config);
-        this.driver = driver;
+    constructor(config: ModuleConfig<DeviceRecord>, deps: Deps) {
+        super(config, deps);
         this.addRoute({
             path: "/devices/:id/command",
             method: "post",
@@ -40,8 +38,9 @@ class DevicesModule extends Module<DeviceRecord> {
         if (!device.address) {
             throw new AppError(`Device ${id} has no address`);
         }
-        await this.driver.write(device.address, command);
-        await this.eventBus.emit(`device.command.sent`, { id, command });
+
+        await this.deps.driver.write(device.address, command);
+        await this.deps.eventBus.emit(`device.command.sent`, { id, command });
     }
 
     async readValue(id: string) {
@@ -53,8 +52,8 @@ class DevicesModule extends Module<DeviceRecord> {
         if (!device.address) {
             throw new AppError(`Device ${id} has no address`);
         }
-        const value = await this.driver.read(device.address);
-        await this.eventBus.emit(`device.value.read`, { id, value });
+        const value = await this.deps.driver.read(device.address);
+        await this.deps.eventBus.emit(`device.value.read`, { id, value });
         return value;
     }
 }
