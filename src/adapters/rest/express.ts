@@ -17,8 +17,8 @@ export class ExpressServerAdapter implements ServerAdapter {
     }
 
     register(module: Module<any>) {
-        const moduleSchemaProvider = module.schema
-        const schema = moduleSchemaProvider.getSchema(module.name)
+        const moduleSchemaProvider = module.schemas
+        const schema = moduleSchemaProvider.getSchema()
         this.deps.logger?.info(`Registering module ${module.name} with schemas ${JSON.stringify(schema)}`);
         this.createRoutes(createCrudRoutes(module));
     }
@@ -52,6 +52,16 @@ export class ExpressServerAdapter implements ServerAdapter {
 
     getRoutes(): Route[] {
         return [...this.routes];
+    }
+
+    generateOpenAPISpec() {
+        return this.routes.map(r => {
+            return {
+                path: r.path,
+                method: r.method,
+                description: r.description,
+            };
+        });
     }
 
     start(port?: number, host?: string) {
