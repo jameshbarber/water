@@ -26,7 +26,9 @@ const createCrudRoutes = (module: Module<any>): Route[] => {
             handler: async (req: any, res: any) => {
                 const prov: any = module.schemas as any;
                 const entity = typeof prov?.getSchema === "function" ? prov.getSchema() : prov;
-                validateOrThrow(entity?.read, req.params.id, `Invalid ${module.name} id`);
+                const idSchema = (entity as any)?.read?.shape?.id as z.ZodTypeAny | undefined;
+                const paramsSchema = z.object({ id: idSchema ?? z.string() });
+                validateOrThrow(paramsSchema, req.params, `Invalid ${module.name} id`);
                 const result = await module.findOne(req.params.id);
                 return res.json(result);
             },
@@ -75,12 +77,15 @@ const createCrudRoutes = (module: Module<any>): Route[] => {
             inputSchemas: (() => {
                 const prov: any = module.schemas as any;
                 const entity = typeof prov?.getSchema === "function" ? prov.getSchema() : prov;
-                return { params: { id: z.string() }, body: entity?.create as any };
+                const idSchema = (entity as any)?.read?.shape?.id as z.ZodTypeAny | undefined;
+                return { params: { id: idSchema ?? z.string() }, body: (entity as any)?.update ?? (entity as any)?.create };
             })(),
             handler: async (req: any, res: any) => {
                 const prov: any = module.schemas as any;
                 const entity = typeof prov?.getSchema === "function" ? prov.getSchema() : prov;
-                validateOrThrow(entity?.create, req.body, `Invalid ${module.name} body`);
+                const idSchema = (entity as any)?.read?.shape?.id as z.ZodTypeAny | undefined;
+                validateOrThrow(z.object({ id: idSchema ?? z.string() }), req.params, `Invalid ${module.name} id`);
+                validateOrThrow((entity as any)?.update ?? (entity as any)?.create, req.body, `Invalid ${module.name} body`);
                 const result = await module.update(req.params.id, req.body);
                 return res.json(result);
             },
@@ -94,7 +99,10 @@ const createCrudRoutes = (module: Module<any>): Route[] => {
                 params: { id: z.string() }
             },
             handler: async (req: any, res: any) => {
-                validateOrThrow(undefined, req.body, `Invalid ${module.name} body`);
+                const prov: any = module.schemas as any;
+                const entity = typeof prov?.getSchema === "function" ? prov.getSchema() : prov;
+                const idSchema = (entity as any)?.read?.shape?.id as z.ZodTypeAny | undefined;
+                validateOrThrow(z.object({ id: idSchema ?? z.string() }), req.params, `Invalid ${module.name} id`);
                 const result = await module.delete(req.params.id);
                 return res.json(result);
             },

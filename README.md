@@ -1,77 +1,107 @@
-# "Water" Hub
-Water makes it effortless to facilitate the control of & collection of readings from various iOT devices over local network via a Raspberry Pi-based hub running this software. It supports multiple device control protocols (GPIO, HTTPS, MQTT) and multiple interfaces (Typed SDK, API, MCP).
+## Water Hub
+Water is a lightweight hub for controlling devices and collecting readings on a local network (e.g. a Raspberry Pi). It supports multiple device protocols and exposes both REST and MCP interfaces, plus a typed SDK.
 
-## Features
-- Batched reading transactions to any data store of your choice
-- Multiple control protocols supported (GPIO, HTTPS, MQTT) and fully extendable to e.g Serial etc.
-- Effortless control & access via multiple interfaces (Typed SDK, API, MCP)
-- Issue commands on certain values with sensor triggers
-- Run commands on cron schedules with Command Schedules
+### Features
+- **Schema-driven modules** with CRUD out of the box
+- **Multiple stores**: JSON, CSV, Drizzle, Postgres
+- **REST API** with generated OpenAPI docs
+- **MCP server** mirroring REST routes as tools
+- **Event-driven** module lifecycle (created/updated events)
 
-## Interfaces
-- Typed API accessible over local network
-- MCP Server accessible over local network
-- Tools SDK (?)
+### Architecture
+- **App + Manifest**: The app is created from a manifest in `src/config.ts` describing interfaces, store, and modules.
+- **Modules**: Each module defines schemas and gets CRUD routes automatically. Built-in modules:
+  - `devices`, `commands`, `triggers`, `readings`, `settings`
+- **Dependencies (Deps)**: Wired in `src/deps.ts`
+  - Logger: `ConsoleLogger`
+  - Event bus: `SimpleEventBus`
+  - Database: `JsonDatabase` | `CsvDatabase` | `DrizzleDatabase` | `PostgresDatabase`
+  - REST server: `ExpressServerAdapter` + `OpenAPIDocGenerator`
+  - MCP: `McpServer`
 
-## Code Architecture 
-This codebase works with the concept of an `App` which is initialised using a `manifest.ts` file containing JSON specs. `Modules` are core CRUD entities, stored in a `Store` of your choice. 
+### Interfaces
+- **REST**
+  - Base URL comes from the manifest `interfaces.rest` host/port. The default example in `src/config.ts` is `http://192.168.1.50:4000`.
+  - Generated CRUD routes per module:
+    - `GET /{module}` – list
+    - `GET /{module}/{id}` – read
+    - `POST /{module}` – create
+    - `PUT /{module}/{id}` – update
+    - `DELETE /{module}/{id}` – delete
+  - **OpenAPI schema**: `GET /docs/rest`
+  - **Settings & manifest** (via `settings` module):
+    - `GET /settings`, `PUT /settings`
+    - `GET /manifest`, `PUT /manifest` (emits `settings.manifest.updated`)
 
-## Storage
-You can store data in pretty much any form using the adapter pattern, and customise this per module. Built in support for local storage in the form of JSON & CSV files, as well as remote storage in the form of POSTGRES and TimescaleDB. To implement a custom storage scheme, simply implement the `ModuleDataStore` interface. 
+- **MCP**
+  - Endpoints: `POST /mcp` (HTTP transport) and `GET /mcp` (SSE stream)
+  - All REST routes are exposed as MCP tools with input schemas derived from zod where available
 
-## Driver
-You can use pretty much any protocol to integrate devices such as sensors and actuators. Out-the-box support for MQTT, GPIO (via polling) & HTTP. To implement a custom driver, such as Serial, extend the `DriverAdapter` interface
+### Storage
+- Configure the store in `src/config.ts` under `manifest.store`:
+  - `type`: `"json" | "csv" | "drizzle" | "postgres"`
+  - `url`: path (for json/csv) or connection string (for postgres)
+- If no store is specified, the app defaults to JSON at `data.json`.
+- For Postgres/Drizzle:
+  - Set `DATABASE_URL` in `.env`
+  - Migrations and tooling:
+    - `pnpm drizzle:generate`
+    - `pnpm drizzle:migrate`
+    - `pnpm drizzle:studio`
 
-## Interfaces
-You can access the hub over pretty much any interface. Out-the-box support for REST & MCP servers, as well as a typed API client. To add a custom interface, such as GraphQL, extend the `InterfaceAdapter` type.
+### Running locally
+1. Install deps: `pnpm install`
+2. Configure `src/config.ts`:
+   - Set `interfaces.rest.host` and `port` as needed (e.g. `0.0.0.0` and `4000` for LAN)
+   - Choose a `store` and, if `drizzle`/`postgres`, set `.env` with `DATABASE_URL`
+3. Start: `pnpm dev`
+   - Server starts at `http://<host>:<port>`
+   - OpenAPI schema at `/docs/rest`
+4. Tests: `pnpm test:unit`
 
-# Stack
-- NodeJS + Typescript
-- Jest
-- Express
-- OpenAPI Typescript
+### SDK
+The SDK lives in `packages/sdk` and is generated from the live OpenAPI schema.
 
+- Generate schema + types: `pnpm sdk:generate` (writes `packages/sdk/openapi.json` and `packages/sdk/src/types.ts`)
+- Build SDK: `pnpm sdk:build`
+- Example usage:
 
-# Understanding this project
-- `src` contains all application code
-    - `adapters` contains implementations of dependencies, e.g `JSONModuleDataStore` for local JSON storage
-        - `database` contains storage adapters, JSON+CSV by default.
-        - `drivers` contains communication protocol drivers, MQTT+HTTPS by default
-        - `logging` contains logger implementations, NOOP and console by default.
-        - `rest` contains an express server implementation of a rest interface
-        - `schema` contains `SchemaProvider` implementations, which depend on the database adapter used.
-    - `core` contains the interfaces & base classes that you can extend or implement to create adapter instances
-        - `dependencies`
-        - `error`
-        - `modules` base module with CRUD & event emittence, to be extended if needed
-    - `modules` contains business logic for relevant zod-schema driven modules. Basic CRUD operations are supported by default via the database adapter. 
-    - `subscribers` contains all listeners for the event bus events
-    - `test` contains all testing mocks
-    - `deps` contains code to configure and inject dependencies
-    - `index.ts` creates the app instance
-    - `manifest.ts` contains the app manifest, and wires in the module schemas. 
+```ts
+import { createSdkClient } from '@add-water/sdk';
 
+const api = createSdkClient({ baseUrl: 'http://192.168.1.50:4000' });
 
-## Adding a new Module
-A module requires three things: a `schema`
+// List devices
+const devices = await api.GET('/devices');
 
+// Create a device
+await api.POST('/devices', { body: { id: 'dev1', driver: 'http' } });
+```
 
-1. Create a new folder in `@/modules` with the name of your Module
-2. Create a `schema.ts` file, where you define a `schema` and `schemaProvider`
-    ```
-    import { ZodSchemaProvider } from "@/adapters/schema";
-    import { z } from "zod";
+### Project layout
+- `src/adapters`
+  - `database`: JSON/CSV/Drizzle/Postgres implementations
+  - `drivers`: MQTT and HTTP drivers
+  - `logging`: console logger
+  - `rest`: Express server, router, and OpenAPI doc generator
+  - `mcp`: HTTP transport exposing REST as MCP tools
+- `src/core`
+  - `modules`: base `Module` with CRUD and events
+  - `dependencies`: contracts and interfaces
+- `src/modules`: business modules and schemas (zod)
+- `src/subscribers`: event listeners
+- `src/index.ts`: `createApp` factory and registration
+- `src/config.ts`: app manifest
+- Root `index.ts`: boots the app in dev
 
-    const myModuleSchema = z.object({
-        id: z.string(),
-        role: z.enum(["sensor", "actuator", "both"]),
-        driver: z.enum(["gpio", "mqtt", "http"]),
-        address: z.record(z.string(), z.any()),
-        labels: z.record(z.string(), z.string()).optional(),
-    });
+### Adding a new module (quick start)
+1. Create a folder in `src/modules/<name>` and define `schema.ts` using zod.
+2. Add it to `src/config.ts` under `manifest.modules` (optionally provide a custom constructor).
+3. Optionally add custom routes with `module.addRoute({ path, method, handler })`.
 
-    const myModuleSchemaProvider = new ZodSchemaProvider(myModuleSchema); 
-
-    export type MyModuleRecord = z.infer<typeof myModuleSchema>;
-    export { myModuleSchemaProvider, myModuleSchema };
-    ```
+### Useful scripts
+- `pnpm dev` – start the hub (ts-node)
+- `pnpm test:unit` – run unit tests
+- `pnpm post:readings` – post sample readings
+- `pnpm sdk:generate` / `pnpm sdk:build` – generate and build the SDK
+- `pnpm drizzle:*` – migration/studio tooling

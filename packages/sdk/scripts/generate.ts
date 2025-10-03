@@ -9,7 +9,6 @@ import openapiTS from "openapi-typescript";
 async function main() {
   const root = resolve(dirname(fileURLToPath(import.meta.url)), "../../..");
   const srcIndex = resolve(root, "src/index.ts");
-
   // Dynamically import the app and manifest
   const { createApp } = await import(srcIndex);
   const manifest = (await import(resolve(root, "src/config.ts"))).default;
@@ -26,7 +25,8 @@ async function main() {
   writeFileSync(openapiPath, JSON.stringify(schema, null, 2), "utf8");
 
   // Generate types
-  const dts = await openapiTS(schema as any, { exportType: false });
+  const dtsRaw = await openapiTS(schema as any, { exportType: false });
+  const dts = Array.isArray(dtsRaw) ? dtsRaw.join("\n") : String(dtsRaw);
   const srcDir = resolve(pkgDir, "src");
   mkdirSync(srcDir, { recursive: true });
   writeFileSync(resolve(srcDir, "types.ts"), dts, "utf8");

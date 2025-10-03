@@ -44,6 +44,25 @@ export class PgRepository<T extends { id?: string }> implements Repository<T> {
         return rows[0] as T;
     }
 
+    async createMany({ data }: { data: (T | Omit<T, "id">)[] }): Promise<T[]> {
+        if (!Array.isArray(data) || data.length === 0) return [] as T[];
+        // Use first row to derive columns
+        const entries = Object.keys(data[0] as Record<string, unknown>);
+        const cols = entries.map((k) => `"${k}"`).join(", ");
+        // Build VALUES placeholders like ($1,$2,...), ($n,...)
+        const values: string[] = [];
+        const params: unknown[] = [];
+        let idx = 1;
+        for (const row of data as any[]) {
+            const placeholders = entries.map(() => `$${idx++}`).join(", ");
+            values.push(`(${placeholders})`);
+            for (const k of entries) params.push((row as any)[k]);
+        }
+        const q = `INSERT INTO "${this.table}" (${cols}) VALUES ${values.join(", ")} RETURNING *`;
+        const { rows } = await this.pool.query(q, params);
+        return rows as T[];
+    }
+
     async update({ where, data }: { where: Where<T>; data: Partial<T> }): Promise<T | null> {
         const setEntries = Object.entries(data as Record<string, unknown>);
         if (setEntries.length === 0) return this.findOne({ where });
@@ -73,7 +92,7 @@ export class PostgresDatabase implements Database {
     async initialize(): Promise<void> { return; }
 
     repo<T extends { id?: string }>(source: any, tableName?: string): Repository<T> {
-        const table = (source && (source as any)._.name) || tableName || String(source);
+        const table = ((source && (source as any)._ && (source as any)._.name) || tableName || String(source));
         return new PgRepository<T>(this.pool, table);
     }
 }

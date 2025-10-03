@@ -57,7 +57,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/commands"
+                "type": "object"
               }
             }
           }
@@ -95,7 +95,7 @@
             "in": "query",
             "required": false,
             "schema": {
-              "$ref": "#/components/schemas/commands"
+              "type": "object"
             }
           }
         ],
@@ -120,7 +120,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/commands"
+                "type": "object"
               }
             }
           }
@@ -172,7 +172,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/devices"
+                "type": "object"
               }
             }
           }
@@ -226,7 +226,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/devices"
+                "type": "object"
               }
             }
           }
@@ -278,7 +278,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/triggers"
+                "type": "object"
               }
             }
           }
@@ -316,7 +316,7 @@
             "in": "query",
             "required": false,
             "schema": {
-              "$ref": "#/components/schemas/triggers"
+              "type": "object"
             }
           }
         ],
@@ -341,7 +341,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/triggers"
+                "type": "object"
               }
             }
           }
@@ -393,7 +393,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/readings"
+                "type": "object"
               }
             }
           }
@@ -431,7 +431,7 @@
             "in": "query",
             "required": false,
             "schema": {
-              "$ref": "#/components/schemas/readings"
+              "type": "object"
             }
           }
         ],
@@ -456,7 +456,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/readings"
+                "type": "object"
               }
             }
           }

@@ -27,7 +27,7 @@ export const makeProcessReadings = (makeCommandsModule: MakeCommandsModule) =>
       return;
     }
 
-    const shouldRunCommand = comparators[trigger.operation](reading.value, threshold);
+    const shouldRunCommand = comparators[trigger.operation](Number(reading.value), threshold);
     if (!shouldRunCommand) {
       return;
     }

@@ -1,7 +1,6 @@
 import createClient, { type RequestOptions, type Middleware } from "openapi-fetch";
-import type { paths } from "./types";
 
-export type SdkClient = ReturnType<typeof createClient<paths>>;
+export type SdkClient = ReturnType<typeof createClient<any>>;
 
 export type CreateSdkOptions = {
   baseUrl?: string;
@@ -12,11 +11,10 @@ export type CreateSdkOptions = {
 
 export function createSdkClient(options: CreateSdkOptions = {}): SdkClient {
   const { baseUrl = "", fetch: customFetch, headers = {}, middleware = [] } = options;
-  return createClient<paths>({
+  return createClient<any>({
     baseUrl,
     fetch: customFetch,
     headers,
-    middleware,
   });
 }
 

@@ -1,21 +1,21 @@
 import Module, { ModuleConfig } from "@/core/modules";
 import { Deps } from "@/deps";
-import { JsonSettingsStore } from "@/adapters/settings/file";
+import { InMemorySettingsStore } from "@/adapters/settings/file";
 
 type KV = { id: string, value: string };
 
 class SettingsModule extends Module<KV> {
-    private store: JsonSettingsStore;
+    private store: InMemorySettingsStore;
 
     constructor(config: ModuleConfig<KV>, deps: Deps) {
         super(config, deps);
-        this.store = new JsonSettingsStore("db/settings.json");
+        this.store = new InMemorySettingsStore();
 
         this.addRoute({
             path: "/settings",
             method: "get",
             summary: "Get settings",
-            description: "Return all settings from file store",
+            description: "Return all settings",
             handler: async (_req: any, res: any) => {
                 return res.json(this.store.getAll());
             },
@@ -24,7 +24,7 @@ class SettingsModule extends Module<KV> {
             path: "/settings",
             method: "put",
             summary: "Update settings",
-            description: "Merge and persist settings to file store",
+            description: "Merge and persist settings",
             handler: async (req: any, res: any) => {
                 const next = this.store.setAll(req.body ?? {});
                 return res.json(next);
@@ -34,7 +34,7 @@ class SettingsModule extends Module<KV> {
             path: "/manifest",
             method: "get",
             summary: "Get manifest",
-            description: "Return the mutable manifest from settings store",
+            description: "Return the mutable manifest",
             handler: async (_req: any, res: any) => {
                 return res.json(this.store.getManifest());
             },
@@ -43,9 +43,10 @@ class SettingsModule extends Module<KV> {
             path: "/manifest",
             method: "put",
             summary: "Update manifest",
-            description: "Persist manifest to settings store",
+            description: "Persist manifest",
             handler: async (req: any, res: any) => {
                 const next = this.store.setManifest(req.body ?? {});
+                this.deps.eventBus.emit("settings.manifest.updated", next);
                 return res.json(next);
             },
         });

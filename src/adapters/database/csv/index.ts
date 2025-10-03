@@ -84,6 +84,23 @@ export class CsvFileAdapter<T extends { id?: string }> implements Repository<T> 
         return item as T;
     }
 
+    async createMany({ data }: { data: (T | Omit<T, "id">)[] }): Promise<T[]> {
+        const items = this.readAll();
+        const out: T[] = [];
+        for (const d of data) {
+            const item = (d as any);
+            if (item.id === undefined || item.id === null) {
+                item.id = randomUUID();
+            } else {
+                item.id = String(item.id);
+            }
+            items.push(item);
+            out.push(item as T);
+        }
+        this.writeAll(items);
+        return out;
+    }
+
     async update({ where, data }: { where: Where<T>; data: Partial<T> }): Promise<T | null> {
         const items = this.readAll();
         const idx = items.findIndex(i => this.matchWhere(i, where));
