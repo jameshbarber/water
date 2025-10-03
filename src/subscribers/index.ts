@@ -1,9 +1,9 @@
-import { eventBus } from "@/config";
+import { logger } from "@/config";
+import { EventBus } from "@/core/dependencies/events";
 
-eventBus.on("test", (data) => {
-    console.log(data);
-});
 
-export default {
-    eventBus,
+export const createSubscribers = (eventBus: EventBus) => {
+    eventBus.on("*", (data, eventName) => {
+        logger.warn(`Event received: ${eventName} ${JSON.stringify(data)}`);
+    });
 }
