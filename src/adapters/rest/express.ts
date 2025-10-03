@@ -4,7 +4,6 @@ import Module from "@/core/modules";
 import { Deps } from "@/deps";
 import express, { Express } from "express";
 import { createCrudRoutes } from "./router";
-import { OpenAPI3, PathsObject } from "openapi-typescript";
 
 export class ExpressServerAdapter implements ServerAdapter {
     server?: Express;
@@ -21,6 +20,7 @@ export class ExpressServerAdapter implements ServerAdapter {
         const moduleSchemaProvider = module.schemas;
         const schema = moduleSchemaProvider?.getSchema?.();
         this.deps.logger?.info(`Registering module ${module.name} with schemas ${JSON.stringify(schema)}`);
+        this.deps.docs?.registerModule(module);
         this.createRoutes(createCrudRoutes(module));
     }
 
@@ -55,27 +55,15 @@ export class ExpressServerAdapter implements ServerAdapter {
         return [...this.routes];
     }
 
-    getOpenAPISchema(): OpenAPI3 {
-        return {
-            openapi: "3.0.0",
-            info: {
-                title: "API",
-                version: "1.0.0"
-            },
-            paths: this.routes.reduce((acc, r) => {
-                const pathItem: any = acc[r.path] || {};
-                pathItem[r.method] = {
-                    summary: r.summary,
-                    description: r.description,
-                    responses: {
-                        200: { description: "OK" }
-                    }
-                };
-                acc[r.path] = pathItem;
-                return acc;
-            }, {} as PathsObject),
-            components: { schemas: {} }
-        };
+    generateDocs(): any {
+        return this.deps.docs?.generate(this.routes);
+    }
+
+    serveDocs() {
+        this.server?.get("/docs/rest", (req: any, res: any) => {
+            const schema = this.deps.docs?.generate(this.routes);
+            res.json(schema);
+        });
     }
 
     start(port?: number, host?: string) {
