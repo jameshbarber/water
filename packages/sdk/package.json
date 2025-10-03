@@ -3,18 +3,21 @@
   "version": "0.1.0",
   "description": "Typed client and React Query hooks for the add-water API",
   "type": "module",
-  "main": "dist/index.cjs",
-  "module": "dist/index.js",
   "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./package.json": "./package.json"
+  },
   "sideEffects": false,
   "files": [
     "dist",
     "openapi.json"
   ],
   "scripts": {
-    "build": "tsc -p ./tsconfig.json",
-    "generate": "tsx ./scripts/generate.ts",
-    "prepublishOnly": "pnpm run generate && pnpm run build"
+    "build": "tsc -p ./tsconfig.json"
   },
   "dependencies": {
     "openapi-fetch": "^0.12.4"

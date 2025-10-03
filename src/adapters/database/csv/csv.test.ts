@@ -57,4 +57,17 @@ describe("CsvFileAdapter", () => {
     expect(typeof item.id).toBe("string");
     expect(item.id).toMatch(/^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i);
   });
+
+  it("createMany appends multiple rows", async () => {
+    const adapter = new CsvFileAdapter<{id?: string, name: string}>(TEST_FILE, logger, "test", ["id", "name"]);
+    const items = await adapter.createMany({ data: [
+      { id: "1", name: "A" },
+      { name: "B" } as any
+    ] });
+    expect(items.length).toBe(2);
+    const content = fs.readFileSync(TEST_FILE, "utf8");
+    const lines = content.trim().split(/\r?\n/);
+    expect(lines[0]).toBe("id,name");
+    expect(lines.length).toBe(3);
+  });
 });

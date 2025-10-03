@@ -57,3 +57,34 @@ export class JsonSettingsStore {
 }
 
 
+export class InMemorySettingsStore {
+    private data: Record<string, any> = {};
+
+    getAll(): Record<string, any> {
+        return { ...this.data };
+    }
+
+    setAll(patch: Record<string, any>): Record<string, any> {
+        this.data = { ...this.data, ...patch };
+        return { ...this.data };
+    }
+
+    get<T = any>(key: string): T | undefined {
+        return this.data[key];
+    }
+
+    set<T = any>(key: string, value: T): T {
+        this.data[key] = value;
+        return value;
+    }
+
+    getManifest<T = any>(): T | undefined {
+        return this.get<T>("manifest");
+    }
+
+    setManifest<T = any>(manifest: T): T {
+        return this.set<T>("manifest", manifest);
+    }
+}
+
+

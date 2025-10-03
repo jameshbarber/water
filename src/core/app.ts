@@ -76,46 +76,37 @@ class App {
 
     start() {
         if (this.manifest.interfaces?.rest?.enabled) {
-            this.deps.rest?.mountSettingsApi?.();
             this.deps.rest?.start(this.manifest.interfaces.rest.port, this.manifest.interfaces.rest.host);
         }
         if (this.manifest.interfaces?.mcp?.enabled) {
             this.deps.mcp?.start();
         }
 
+        // Seed DB settings only when using a DB-backed store (postgres/drizzle)
         try {
-            this.deps.database?.repo?.("settings").create?.({
-                data: {
-                    id: "manifest",
-                    value: JSON.stringify(this.manifest)
-                },
-            });
-            this.deps.database?.repo?.("settings").create?.({
-                data: {
-                    id: "name",
-                    value: this.manifest.name
-                },
-            });
+            const storeType = this.manifest.store?.type;
+            if (storeType === "postgres" || storeType === "drizzle") {
+                // Fire-and-forget seeding; ignore if table is missing
+                this.deps.database?.repo?.("settings").create?.({
+                    data: { id: "manifest", value: JSON.stringify(this.manifest) }
+                } as any);
+                this.deps.database?.repo?.("settings").create?.({
+                    data: { id: "name", value: this.manifest.name }
+                } as any);
+            }
         } catch {
-            // ignore in tests without database
+            // ignore if table doesn't exist or in tests
         }
 
-        const pollMs = Number(process.env.SETTINGS_POLL_MS || 0);
-        if (pollMs > 0) {
-            const t = setInterval(() => {
-                try {
-                    const raw = fs.existsSync("db/settings.json") ? fs.readFileSync("db/settings.json", "utf8") : "{}";
-                    const parsed = JSON.parse(raw || "{}");
-                    const next = parsed?.manifest;
-                    if (next && typeof next === "object" && next.name && next.version) {
-                        this.manifest = next;
-                    }
-                } catch {
-                    // swallow
+        // Subscribe to in-memory manifest updates
+        this.deps.eventBus.on("settings.manifest.updated", (next: any) => {
+            try {
+                if (next && typeof next === "object" && next.name && next.version) {
+                    this.manifest = next;
+                    this.deps.logger?.info?.(`Manifest updated to ${next.name}@${next.version}`);
                 }
-            }, pollMs);
-            (t as any)?.unref?.();
-        }
+            } catch {}
+        });
     }
 }
 

@@ -4,7 +4,7 @@ import { Deps } from "@/deps";
 import express, { Express } from "express";
 import { createCrudRoutes } from "./router";
 import AppError from "@/core/error";
-import { JsonSettingsStore } from "@/adapters/settings/file";
+import { InMemorySettingsStore } from "@/adapters/settings/file";
 
 
 export class ExpressServerAdapter implements ServerAdapter {
@@ -12,7 +12,7 @@ export class ExpressServerAdapter implements ServerAdapter {
     deps: Deps;
     private routes: Route[] = [];
     private docs?: DocumentGenerator;
-    private settings?: JsonSettingsStore;
+    private settings?: InMemorySettingsStore;
 
     constructor(deps: Deps) {
         this.deps = deps;
@@ -27,7 +27,8 @@ export class ExpressServerAdapter implements ServerAdapter {
             next();
         });
         this.docs = deps.docs;
-        this.settings = new JsonSettingsStore("db/settings.json");
+        this.serveDocs()
+        this.settings = new InMemorySettingsStore();
     }
 
     register(module: Module<any>) {
@@ -100,6 +101,7 @@ export class ExpressServerAdapter implements ServerAdapter {
         });
         app.put("/manifest", (req: any, res: any) => {
             const next = this.settings?.setManifest(req.body ?? {});
+            this.deps.eventBus.emit("settings.manifest.updated", next);
             res.json(next ?? {});
         });
     }

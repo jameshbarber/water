@@ -1,6 +1,23 @@
 import { Logger, LogLevel } from "@/core/dependencies/logger";
 import { nowIso, shouldLog, ConsoleLogger } from "@/adapters/logging/console";
-import chalk from "chalk";
+// Avoid importing ESM-only chalk in tests; lazy-load to limit impact
+let chalk: any;
+function getChalk() {
+  if (!chalk) {
+    try {
+      // eslint-disable-next-line @typescript-eslint/no-var-requires
+      chalk = require("chalk");
+    } catch {
+      chalk = {
+        gray: (s: string) => s,
+        blue: (s: string) => s,
+        yellow: (s: string) => s,
+        red: (s: string) => s,
+      };
+    }
+  }
+  return chalk;
+}
 
 export class RichLogger extends ConsoleLogger {
 
@@ -17,11 +34,12 @@ export class RichLogger extends ConsoleLogger {
   }
 
   private formatLevel(level: LogLevel): string {
+    const c = getChalk();
     const levels = {
-      debug: chalk.gray('DEBUG'),
-      info: chalk.blue('INFO '),
-      warn: chalk.yellow('WARN '),
-      error: chalk.red('ERROR')
+      debug: c.gray('DEBUG'),
+      info: c.blue('INFO '),
+      warn: c.yellow('WARN '),
+      error: c.red('ERROR')
     };
     return levels[level];
   }
@@ -29,17 +47,20 @@ export class RichLogger extends ConsoleLogger {
   private formatMeta(meta: any[]): string {
     if (!meta.length) return '';
     const formatted = meta.length === 1 ? meta[0] : meta;
-    return chalk.gray(`\n${JSON.stringify(formatted, null, 2)}`);
+    const c = getChalk();
+    return c.gray(`\n${JSON.stringify(formatted, null, 2)}`);
   }
 
   private formatContext(): string {
     if (!Object.keys(this.context).length) return '';
-    return chalk.gray(` ${JSON.stringify(this.context)}`);
+    const c = getChalk();
+    return c.gray(` ${JSON.stringify(this.context)}`);
   }
 
   protected format(level: LogLevel, message: string, meta: any[]): string {
+    const c = getChalk();
     return [
-      chalk.gray(nowIso()),
+      c.gray(nowIso()),
       this.formatLevel(level),
       message,
       this.formatContext(),

@@ -8,7 +8,10 @@
     "test:unit": "jest",
     "sdk:generate": "pnpm exec tsx packages/sdk/scripts/generate.ts",
     "sdk:build": "pnpm --prefix packages/sdk run build",
-    "post:readings": "pnpm exec tsx scripts/post-readings.ts"
+    "post:readings": "pnpm exec tsx scripts/post-readings.ts",
+    "drizzle:generate": "pnpm exec drizzle-kit generate --config=drizzle.config.ts",
+    "drizzle:migrate": "pnpm exec drizzle-kit migrate --config=drizzle.config.ts",
+    "drizzle:studio": "pnpm exec drizzle-kit studio --config=drizzle.config.ts"
   },
   "keywords": [],
   "author": "",

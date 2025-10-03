@@ -22,7 +22,9 @@ export class OpenAPIDocGenerator implements DocumentGenerator {
         const isZod = candidate && typeof (candidate as any)?._def?.typeName === "string";
         if (isZod) {
             const json: any = zodToJsonSchema(candidate as z.ZodTypeAny, module.name);
-            const def = json?.definitions?.[module.name] ?? json;
+            const def = (json && (json as any).definitions && (json as any).definitions[module.name])
+                || (json && (json as any).$defs && (json as any).$defs[module.name])
+                || json;
             this.componentSchemas[module.name] = def ?? {};
         }
     }
@@ -67,7 +69,7 @@ export class OpenAPIDocGenerator implements DocumentGenerator {
                         name: "query",
                         in: "query",
                         required: false,
-                        schema: moduleKey ? { $ref: `#/components/schemas/${moduleKey}` } : { type: "object" }
+                        schema: (moduleKey && this.componentSchemas[moduleKey]) ? this.componentSchemas[moduleKey] : { type: "object" }
                     });
                 }
 
@@ -78,7 +80,7 @@ export class OpenAPIDocGenerator implements DocumentGenerator {
                         required: true,
                         content: {
                             "application/json": {
-                                schema: moduleKey ? { $ref: `#/components/schemas/${moduleKey}` } : { type: "object" }
+                                schema: (moduleKey && this.componentSchemas[moduleKey]) ? this.componentSchemas[moduleKey] : { type: "object" }
                             }
                         }
                     }

@@ -7,6 +7,7 @@ import DevicesModule, { deviceSchemaProvider } from "./modules/devices";
 import { triggerSchemaProvider } from "./modules/triggers";
 import { readingsSchemaProvider } from "./modules/readings";
 import SettingsModule from "./modules/settings/module";
+import ReadingsModule from "./modules/readings/module";
 
 const manifest: AppManifest = {
     "name": "water",
@@ -22,8 +23,8 @@ const manifest: AppManifest = {
         }
     },
     "store": {
-        "type": "json", 
-        "url": "db/data.json"
+        "type": "drizzle", 
+        "url": process.env.DATABASE_URL as string
     },
     "modules": {
         "commands": {
@@ -42,7 +43,12 @@ const manifest: AppManifest = {
         }, 
         "readings": {
             "name": "readings",
-            "schema": readingsSchemaProvider
+            "schema": readingsSchemaProvider, 
+            "buffer": {
+                "enabled": true,
+                "intervalMs": 1000
+            },
+            "constructor": ReadingsModule
         },
         "settings": {
             "name": "settings",

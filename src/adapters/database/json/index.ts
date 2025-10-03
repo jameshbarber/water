@@ -97,6 +97,28 @@ export class JsonFileAdapter<T extends { id?: string }> implements Repository<T>
         return item;
     }
 
+    async createMany({ data }: { data: (T | Omit<T, "id">)[] }): Promise<T[]> {
+        const root = this.readRoot();
+        const store = (root[this.table] ?? { items: [] }) as JsonStore<T>;
+        const out: T[] = [];
+        for (const d of data) {
+            const item = (d as T);
+            if ((item as any).id === undefined || (item as any).id === null) {
+                (item as any).id = randomUUID();
+            }
+            const idx = store.items.findIndex(i => (i as any).id === (item as any).id);
+            if (idx >= 0) {
+                store.items[idx] = item;
+            } else {
+                store.items.push(item);
+            }
+            out.push(item);
+        }
+        root[this.table] = store as any;
+        this.writeRoot(root);
+        return out;
+    }
+
     async update({ where, data }: { where: Where<T>; data: Partial<T> }): Promise<T | null> {
         const root = this.readRoot();
         const store = (root[this.table] ?? { items: [] }) as JsonStore<T>;

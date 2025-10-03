@@ -118,4 +118,20 @@ describe("JsonFileAdapter", () => {
       { id: "2", name: "Test" }
     ]);
   });
+
+  it("createMany persists multiple records and assigns ids when missing", async () => {
+    const adapter = new JsonFileAdapter<{id?: string, name: string}>(TEST_FILE, logger, "test");
+
+    const items = await adapter.createMany({ data: [
+      { id: "1", name: "A" },
+      { name: "B" } as any,
+    ] });
+
+    expect(items.length).toBe(2);
+    expect(items[0]).toEqual({ id: "1", name: "A" });
+    expect(typeof items[1].id).toBe("string");
+
+    const content = JSON.parse(fs.readFileSync(TEST_FILE, "utf8"));
+    expect(content.test.items.length).toBe(2);
+  });
 });
