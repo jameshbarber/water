@@ -34,6 +34,6 @@ describe("RestInterface", () => {
     it("should register a route with the server", () => {
         const restInterface = new RestInterface("test", "1.0.0", {use: jest.fn()} as any, {} as any);
         restInterface.registerRoute({} as any);
-        expect(restInterface.server.use).toHaveBeenCalled();
+        expect(restInterface.server.createRoute).toHaveBeenCalled();
     });
 }); 
