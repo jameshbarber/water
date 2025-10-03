@@ -30,7 +30,7 @@ const readingsQuery = z.object({
     timestamp: z.string().datetime().optional(),
 });
 
-const readingsSchemaProvider: SchemaProvider<any> = {
+const readingsSchemaProvider: SchemaProvider<any> & { getTable?: () => any } = {
     getSchema() {
         return {
             create: readingsCreate,
@@ -39,7 +39,10 @@ const readingsSchemaProvider: SchemaProvider<any> = {
             query: readingsQuery,
         } as any;
     },
-    listSchemas() { return ["default"]; }
+    listSchemas() { return ["default"]; },
+    getTable() {
+        return readingsTable;
+    }
 };
 export type ReadingRecord = typeof readingsTable.$inferSelect;
 export { readingsSchemaProvider };
