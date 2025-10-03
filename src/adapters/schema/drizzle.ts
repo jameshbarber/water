@@ -1,7 +1,5 @@
 import type { SchemaProvider, EntitySchema } from "./types";
 
-// Lightweight wrapper that derives Zod from Drizzle tables when available.
-// We avoid importing drizzle-zod at module top-level to keep it optional.
 
 type DrizzleTable = any;
 
@@ -16,7 +14,7 @@ export class DrizzleSchemaProvider implements SchemaProvider {
         this.tables.set(name, table);
     }
 
-    getSchema(entityName: string): EntitySchema<any, any, any> | undefined {
+    getSchema(entityName: string): EntitySchema<any, any, any, any> | undefined {
         const table = this.tables.get(entityName);
         if (!table) return undefined;
 
@@ -35,8 +33,7 @@ export class DrizzleSchemaProvider implements SchemaProvider {
         return {
             create: createSchema,
             read: readSchema,
-            // query schema left undefined; callers can provide if needed
-        } as EntitySchema<any, any, any>;
+        } as EntitySchema<any, any, any, any>;
     }
 
     listSchemas(): string[] {
