@@ -1,9 +1,10 @@
-import Module from "@/core/modules/module";
-import { ModuleConfig } from "@/core/modules/module";
+import Module from "@/core/modules";
+import { ModuleConfig } from "@/core/modules";
 import { TriggerRecord } from "./schema";
 import { ReadingRecord } from "../readings";
 import { makeProcessReadings } from "./listeners";
-import CommandsModule from "../commands";
+import commandsModuleFactory from "../commands/factory";
+import AppError from "@/core/error";
 
 class TriggerModule extends Module<TriggerRecord> {
     constructor(config: ModuleConfig<TriggerRecord>) {
@@ -25,8 +26,11 @@ class TriggerModule extends Module<TriggerRecord> {
     async registerListeners() {
         this.eventBus.on("readings.created", async (readings: ReadingRecord[]) => {
             const triggers = await this.findMany({ event: "readings.created"});
+            if (!this.app?.deps) {
+                throw new AppError("App dependencies not found");
+            }
             for (const trigger of triggers) {
-                await makeProcessReadings(() => new CommandsModule({store: this.store, eventBus: this.eventBus, schema: this.schema, app: this.app}))(trigger, readings);
+                await makeProcessReadings(commandsModuleFactory(this.app.deps))(trigger, readings);
             }
         });
     }   

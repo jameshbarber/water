@@ -1,5 +1,5 @@
-import Module from "@/core/modules/module";
-import { ModuleConfig } from "@/core/modules/module";
+import Module from "@/core/modules";
+import { ModuleConfig } from "@/core/modules";
 import { exec } from "node:child_process";
 import { promisify } from "node:util";
 import { CommandRecord } from "./schema";

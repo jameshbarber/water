@@ -1,5 +1,5 @@
-import Module from "@/core/modules/module";
-import { ModuleConfig } from "@/core/modules/module";
+import Module from "@/core/modules";
+import { ModuleConfig } from "@/core/modules";
 import { DeviceRecord } from "./schema";
 import { Driver } from "@/core/dependencies/drivers";
 import AppError from "@/core/error";
