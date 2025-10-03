@@ -1,5 +1,5 @@
-import type CommandsModule from "../commands";
-import type { ReadingRecord } from "../readings";
+import type CommandsModule from "@/modules/commands";
+import type { ReadingRecord } from "@/modules/readings";
 import type { TriggerRecord } from "./schema";
 
 type MakeCommandsModule = () => CommandsModule;

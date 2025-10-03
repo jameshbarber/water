@@ -1,10 +1,10 @@
 import { DatabaseAdapter, Where } from "@/core/dependencies/db";
 import { SchemaProvider } from "@/adapters/schema/types";
 import { EventBus } from "@/core/dependencies/events";
-import AppError from "../error";
-import App from "../app";
-import { Route } from "../dependencies/interfaces/rest";
-import { Logger } from "../dependencies/logger";
+import AppError from "@/core/error";
+import App from "@/core/app";
+import { Route } from "@/core/dependencies/interfaces/rest";
+import { Logger } from "@/core/dependencies/logger";
 
 export interface ModuleConfig<T extends { id: string }> {
     name: string;

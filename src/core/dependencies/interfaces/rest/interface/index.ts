@@ -1,7 +1,6 @@
-import { AppInterface } from "../../types";
+import { AppInterface } from "@/core/dependencies/interfaces/types";
 import { Deps } from "@/deps";
-import { Route } from "../server/routes";
-import { ServerAdapter } from "../server";
+import { Route, ServerAdapter } from "@/core/dependencies/interfaces/rest";
 
 export class RestInterface extends AppInterface {
     server: ServerAdapter;    

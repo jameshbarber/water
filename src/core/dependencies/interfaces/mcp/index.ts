@@ -1,4 +1,4 @@
-import { AppInterface } from "../types";
+import { AppInterface } from "@/core/dependencies/interfaces/types";
 import type { Deps } from "@/deps";
 import { McpServerAdapter, McpTool } from "./types";
 
