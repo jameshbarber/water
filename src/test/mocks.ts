@@ -2,6 +2,7 @@ import { ZodSchemaProvider } from "@/adapters/schema";
 import type { SchemaProvider } from "@/adapters/schema/types";
 import type { EventBus } from "@/core/dependencies/events";
 import { ModuleConfig } from "@/core/modules";
+import { z } from "zod";
 
 export const makeDbSchema = () => {
   return {
@@ -20,17 +21,17 @@ export const makeEventBus = () => {
   } as unknown as EventBus;
 };
 
-export const makeSchema = (): SchemaProvider => {
-  const schema = new ZodSchemaProvider();
-  return schema as unknown as SchemaProvider;
+export const makeSchema = (schema: z.ZodObject): SchemaProvider => {
+  const schemaProvider = new ZodSchemaProvider(schema);
+  return schemaProvider as unknown as SchemaProvider;
 };
 
-export const makeModuleConfig = () => {
+export const makeModuleConfig = (schema: z.ZodObject) => {
   return {
     store: makeDbSchema(),
     name: "settings",
     eventBus: makeEventBus(),
-    schema: makeSchema(),
+    schema: makeSchema(schema),
     logger: makeLogger(),
   } as ModuleConfig<any>;
 };

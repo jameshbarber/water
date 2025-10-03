@@ -51,3 +51,27 @@ You can access the hub over pretty much any interface. Out-the-box support for R
     - `index.ts` creates the app instance
     - `manifest.ts` contains the app manifest, and wires in the module schemas. 
 
+
+## Adding a new Module
+A module requires three things: a `schema`
+
+
+1. Create a new folder in `@/modules` with the name of your Module
+2. Create a `schema.ts` file, where you define a `schema` and `schemaProvider`
+    ```
+    import { ZodSchemaProvider } from "@/adapters/schema";
+    import { z } from "zod";
+
+    const myModuleSchema = z.object({
+        id: z.string(),
+        role: z.enum(["sensor", "actuator", "both"]),
+        driver: z.enum(["gpio", "mqtt", "http"]),
+        address: z.record(z.string(), z.any()),
+        labels: z.record(z.string(), z.string()).optional(),
+    });
+
+    const myModuleSchemaProvider = new ZodSchemaProvider(myModuleSchema); 
+
+    export type MyModuleRecord = z.infer<typeof myModuleSchema>;
+    export { myModuleSchemaProvider, myModuleSchema };
+    ```

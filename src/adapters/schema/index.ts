@@ -1,34 +1,21 @@
 import { SchemaProvider, EntitySchema } from "./types";
+import { z } from "zod";
 
-
-// Simple Zod-based schema provider for JSON-backed entities
+// Zod-based provider for a single table/entity schema
 export class ZodSchemaProvider implements SchemaProvider {
-    private entitySchemas: Map<string, EntitySchema<any, any, any, any>>;
+    private entity: EntitySchema<any, any, any, any>;
 
-    constructor(schema?: EntitySchema<any, any, any, any>) {
-        this.entitySchemas = new Map(Object.entries(schema ?? {}));
+    constructor(schema?: z.ZodObject) {
+        const base = schema ?? z.object({});
+        this.entity = {
+            create: base.partial(),
+            read: base,
+            update: base.partial(),
+            query: base.partial(),
+        } as EntitySchema<any, any, any, any>;
     }
 
-    create<TC, TR = TC, TU = TC, TQ = Partial<TR>>(name: string, schema: {
-        create: import("zod").ZodType<TC>;
-        read?: import("zod").ZodType<TR>;
-        update?: import("zod").ZodType<TU>;
-        query?: import("zod").ZodType<TQ>;
-    }): void {
-        const entity: EntitySchema<TC, TR, TU, TQ> = {
-            create: schema.create,
-            read: (schema.read ?? schema.create) as import("zod").ZodType<TR>,
-            update: (schema.update ?? schema.create) as import("zod").ZodType<TU>,
-            query: schema.query
-        };
-        this.entitySchemas.set(name, entity);
-    }
-
-    getSchema(entityName: string): EntitySchema<any, any, any, any> | undefined {
-        return this.entitySchemas.get(entityName);
-    }
-
-    listSchemas(): string[] {
-        return Array.from(this.entitySchemas.keys());
+    getSchema(): EntitySchema<any, any, any, any> | undefined {
+        return this.entity;
     }
 }

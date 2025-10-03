@@ -6,16 +6,16 @@ type DrizzleTable = any;
 export class DrizzleSchemaProvider implements SchemaProvider {
     private tables: Map<string, DrizzleTable>;
 
-    constructor(tables?: Record<string, DrizzleTable>) {
-        this.tables = new Map(Object.entries(tables ?? {}));
+    constructor(table?: DrizzleTable) {
+        this.tables = new Map(Object.entries(table ?? {}));
     }
 
-    create(name: string, table: DrizzleTable): void {
-        this.tables.set(name, table);
+    create(table: DrizzleTable): void {
+        this.tables.set("default", table);
     }
 
-    getSchema(entityName: string): EntitySchema<any, any, any, any> | undefined {
-        const table = this.tables.get(entityName);
+    getSchema(): EntitySchema<any, any, any, any> | undefined {
+        const table = this.tables.get("default");
         if (!table) return undefined;
 
         // Dynamically load drizzle-zod only when needed

@@ -13,21 +13,20 @@ const logger = new NoopLogger();
 
 describe("ZodSchemaProvider", () => {
     it("registers and retrieves schemas", () => {
-        const provider = new ZodSchemaProvider();
+        
 
         const create = z.object({
             id: z.string().uuid().optional(),
             name: z.string(),
             age: z.number().int().min(0)
         });
+        const provider = new ZodSchemaProvider(create);
 
-        provider.create("user", { create });
 
-        const schema = provider.getSchema("user");
+        const schema = provider.getSchema();
         expect(schema).toBeDefined();
         expect(() => schema!.create.parse({ name: "A", age: 1 })).not.toThrow();
         expect(() => schema!.read.parse({ id: randomUUID(), name: "A", age: 1 })).not.toThrow();
-        expect(provider.listSchemas()).toEqual(["user"]);
     });
 });
 

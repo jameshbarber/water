@@ -1,5 +1,6 @@
 import { devicesModuleFactory } from "./factory";
 import { makeSchema, makeDriver, makeDeps } from "@/test/mocks";
+import { deviceSchema } from "./schema";
 
 describe("Device Module", () => {
     beforeEach(() => {
@@ -9,7 +10,7 @@ describe("Device Module", () => {
     it("should be defined", () => {
         const deps = makeDeps();
         const cp = makeDriver();
-        const mod = devicesModuleFactory(deps, makeSchema(), cp)();
+        const mod = devicesModuleFactory(deps, makeSchema(deviceSchema), cp)();
         expect(mod).toBeDefined();
     });
 
@@ -17,7 +18,7 @@ describe("Device Module", () => {
         const deps = makeDeps();
         deps.db.findOne.mockResolvedValue({ id: "1", role: "actuator", address: { x: 1 } });
         const cp = makeDriver();
-        const mod = devicesModuleFactory(deps, makeSchema(), cp)();
+        const mod = devicesModuleFactory(deps, makeSchema(deviceSchema), cp)();
         await mod.sendCommand("1", "test");
         expect(cp.write).toHaveBeenCalledWith({ x: 1 }, "test");
         expect(deps.eventBus.emit).toHaveBeenCalledWith("device.command.sent", { id: "1", command: "test" });
@@ -28,7 +29,7 @@ describe("Device Module", () => {
         deps.db.findOne.mockResolvedValue({ id: "1", role: "sensor", address: { x: 1 } });
         const cp = makeDriver();
         cp.read.mockResolvedValue("test");
-        const mod = devicesModuleFactory(deps, makeSchema(), cp)();
+        const mod = devicesModuleFactory(deps, makeSchema(deviceSchema), cp)();
         await mod.readValue("1");
         expect(cp.read).toHaveBeenCalledWith({ x: 1 });
         expect(deps.eventBus.emit).toHaveBeenCalledWith("device.value.read", { id: "1", value: "test" });
@@ -38,7 +39,7 @@ describe("Device Module", () => {
         const deps = makeDeps();
         deps.db.findOne.mockResolvedValue({ id: "1", role: "sensor", address: { x: 1 } });
         const cp = makeDriver();
-        const mod = devicesModuleFactory(deps, makeSchema(), cp)();
+        const mod = devicesModuleFactory(deps, makeSchema(deviceSchema), cp)();
         await expect(mod.sendCommand("1", "test")).rejects.toThrow("Device 1 is not an actuator");
     });
     
@@ -46,7 +47,7 @@ describe("Device Module", () => {
         const deps = makeDeps();
         deps.db.findOne.mockResolvedValue({ id: "1", role: "actuator" });
         const cp = makeDriver();
-        const mod = devicesModuleFactory(deps, makeSchema(), cp)();
+        const mod = devicesModuleFactory(deps, makeSchema(deviceSchema), cp)();
         await expect(mod.sendCommand("1", "test")).rejects.toThrow("Device 1 has no address");
     });
     
@@ -54,7 +55,7 @@ describe("Device Module", () => {
         const deps = makeDeps();
         deps.db.findOne.mockResolvedValue({ id: "1", role: "actuator", address: { x: 1 } });
         const cp = makeDriver();
-        const mod = devicesModuleFactory(deps, makeSchema(), cp)();
+        const mod = devicesModuleFactory(deps, makeSchema(deviceSchema), cp)();
         await expect(mod.readValue("1")).rejects.toThrow("Device 1 is not a sensor");
     });
 });

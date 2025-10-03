@@ -58,11 +58,11 @@ class App {
 
     register<T extends { id: string }>(module: Module<T>) {
         const {name, schema, store} = module;
-        if (!schema.getSchema(name)?.read) {
+        if (!schema.getSchema()?.read) {
             throw new Error(`Schema for ${name} is not defined`);
         }
-        this.moduleConfigs[name] = { schema: schema.getSchema(name)?.read as z.Schema, store, name };
-        if (this.manifest.interfaces?.rest) {
+        this.moduleConfigs[name] = { schema: schema.getSchema()?.read as z.Schema, store, name };
+        if (this.manifest.interfaces?.rest?.enabled) {
             this.deps.rest?.register(module);
         }
     }

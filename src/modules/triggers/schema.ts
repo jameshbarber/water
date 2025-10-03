@@ -1,8 +1,6 @@
 import { ZodSchemaProvider } from "@/adapters/schema";
 import { z } from "zod";
 
-const triggerSchemaProvider = new ZodSchemaProvider();
-
 const triggerSchema = z.object({
     id: z.string(),
     name: z.string(),
@@ -22,11 +20,7 @@ const triggerSchema = z.object({
     }
 });
 
-triggerSchemaProvider.create("triggers", {
-    create: triggerSchema,
-    read: triggerSchema,
-    query: triggerSchema,
-});
+const triggerSchemaProvider = new ZodSchemaProvider(triggerSchema);
 
 export type TriggerRecord = z.infer<typeof triggerSchema>;
 export { triggerSchemaProvider, triggerSchema };
