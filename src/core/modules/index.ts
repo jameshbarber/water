@@ -12,7 +12,7 @@ export interface ModuleManifestConfig {
 export interface ModuleConfig<T> extends ModuleManifestConfig {
     schema?: SchemaProvider<T>;
     store?: string;
-    buffer?: { enabled?: boolean; intervalMs?: number };
+    buffer?: { enabled?: boolean; intervalMs?: number; maxItems?: number };
 }
 
 export default class Module<T extends { id: string }> {
@@ -29,7 +29,7 @@ export default class Module<T extends { id: string }> {
         this.schemas = (config.schema as any) || ({ getSchema: () => undefined } as any);
         this.config = config;
         if (this.config.buffer?.enabled && this.deps.buffer) {
-            const interval = this.config.buffer.intervalMs ?? 1000;
+            const interval = this.config.buffer.intervalMs ?? 0;
             const bucket = this.name;
             this.deps.buffer.setFlushHandler(bucket, async (items: any[]) => {
                 const tableSource = (this.schemas as any)?.getTable?.();
@@ -44,7 +44,11 @@ export default class Module<T extends { id: string }> {
                     }
                 }
             });
-            this.deps.buffer.start(bucket, interval);
+            if (interval > 0) this.deps.buffer.start(bucket, interval);
+            const maxItems = this.config.buffer.maxItems;
+            if (typeof maxItems === "number" && maxItems > 0 && (this.deps.buffer as any).setThreshold) {
+                (this.deps.buffer as any).setThreshold(bucket, maxItems);
+            }
         }
     }
 
