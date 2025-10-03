@@ -17,7 +17,7 @@ class SimpleEventBus extends EventBus {
         this.events[eventName].forEach(callback => callback(data));
     }
 
-    on<T>(eventName: string, callback: (data: T) => void) {
+    on<T>(eventName: string, callback: (data: T, eventName: string) => void) {
         if (!eventName) {
             throw new Error("Event name is required");
         }
