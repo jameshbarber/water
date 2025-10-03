@@ -1,13 +1,14 @@
 import type { Deps } from "@/deps";
-import type { SchemaProvider } from "@/adapters/schema/types";
 import TriggerModule from "./module";
+import { ModuleConfig } from "@/core/modules";
+import { TriggerRecord } from "./schema";
 
 export const triggersModuleFactory = (
   deps: Deps,
-  schema: SchemaProvider,
+  config: ModuleConfig<TriggerRecord>,
 ) => {
   return () => {
-    const module = new TriggerModule({ name: "triggers", store: deps.db, eventBus: deps.eventBus, schema, logger: deps.logger });
+    const module = new TriggerModule(config, deps);
     return module;
   };
 };

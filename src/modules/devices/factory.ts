@@ -1,18 +1,14 @@
 import type { Deps } from "@/deps";
-import type { SchemaProvider } from "@/adapters/schema/types";
-import type { Driver } from "@/core/dependencies/drivers";
 import DevicesModule from "./module";
+import { DeviceRecord } from "./schema";
+import { ModuleConfig } from "@/core/modules";
 
 export const devicesModuleFactory = (
   deps: Deps,
-  schema: SchemaProvider,
-  driver: Driver
+  config: ModuleConfig<DeviceRecord>
 ) => {
   return () => {
-    const module = new DevicesModule(
-    { name: "devices", store: deps.db, eventBus: deps.eventBus, schema, logger: deps.logger },
-    driver
-  );
-  return module;
+    const module = new DevicesModule(config, deps);
+    return module;
   };
 };
