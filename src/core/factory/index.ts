@@ -1,5 +1,5 @@
 import { Deps } from "@/deps";
-import Module from "@/core/modules/module";
+import Module from "@/core/modules";
 import { SchemaProvider } from "@/adapters/schema/types";
 
 // Base binder for Module-like classes. Supports optional extra ctor args.
