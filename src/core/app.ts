@@ -18,12 +18,23 @@ export interface AppModuleConfigs {
     };
 }
 
+interface InterfaceConfiguration {
+    enabled: boolean;
+}
+
+interface RestInterfaceConfiguration {
+    enabled: boolean;
+    port: number;
+    host: string;
+}
+
+
 export interface AppManifest {
     name: string;
     version: string;
     interfaces: {
-        mcp: boolean;
-        rest: boolean;
+        mcp?: InterfaceConfiguration;
+        rest?: RestInterfaceConfiguration;
     };
     dependencies: {
         [key: string]: string;
@@ -57,10 +68,10 @@ class App {
     }
 
     start() {
-        if (this.manifest.interfaces?.rest) {
-            this.deps.rest?.start();
+        if (this.manifest.interfaces?.rest?.enabled) {
+            this.deps.rest?.start(this.manifest.interfaces.rest.port, this.manifest.interfaces.rest.host);
         }
-        if (this.manifest.interfaces?.mcp) {
+        if (this.manifest.interfaces?.mcp?.enabled) {
             this.deps.mcp?.start();
         }
     }
