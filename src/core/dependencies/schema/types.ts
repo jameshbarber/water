@@ -7,6 +7,6 @@ export interface EntitySchema<TCreate, TRead, TQuery> {
 }
 
 export interface SchemaProvider {
-    getSchema(entityName: string): EntitySchema<any, any, any> | undefined;
+    getSchema(entityName?: string): EntitySchema<any, any, any> | undefined;
     listSchemas(): string[];
 }
