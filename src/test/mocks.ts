@@ -1,6 +1,7 @@
 import { ZodSchemaProvider } from "@/adapters/schema";
 import type { SchemaProvider } from "@/adapters/schema/types";
 import type { EventBus } from "@/core/dependencies/events";
+import { ModuleConfig } from "@/core/modules";
 
 export const makeDbSchema = () => {
   return {
@@ -30,7 +31,8 @@ export const makeModuleConfig = () => {
     name: "settings",
     eventBus: makeEventBus(),
     schema: makeSchema(),
-  } as any;
+    logger: makeLogger(),
+  } as ModuleConfig<any>;
 };
 
 export const makeDriver = () => {
