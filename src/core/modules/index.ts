@@ -53,7 +53,9 @@ export default class Module<T extends { id: string }> {
         const val = await this.store.create({
             data: data
         })
-        this.logger?.debug(`Emitting event: ${this.name}.created ${JSON.stringify(val)}`);
+        if (this?.logger?.debug) {  
+            this.logger.debug(`Emitting event: ${this.name}.created ${JSON.stringify(val)}`);
+        }
         this.eventBus.emit(`${this.name}.created`, val);
         return val;
     }
