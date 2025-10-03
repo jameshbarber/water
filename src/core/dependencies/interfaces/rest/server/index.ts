@@ -1,7 +1,10 @@
-import { RouteInterface } from "./routes";
+import Module from "@/core/modules";
+import { Route } from "./routes";
 
 export interface ServerAdapter {
-    use(route: RouteInterface): void;
-    mountRoutes(routes: RouteInterface[]): void;
+    register(module: Module<any>): void;
+    use(route: Route): void;
+    mountRoutes(routes: Route[]): void;
+    getRoutes(): Route[];
     start(): void;
 }
