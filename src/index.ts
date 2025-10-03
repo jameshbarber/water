@@ -3,6 +3,8 @@ import { AppManifest } from "./core/app";
 import App from "./core/app";
 import { deviceSchemaProvider } from "./modules/devices";
 import { devicesModuleFactory } from "./modules/devices/factory";
+import { triggerSchemaProvider } from "./modules/triggers/schema";
+import { triggersModuleFactory } from "./modules/triggers/factory";
 import { Driver } from "./core/dependencies/drivers";
 
 export function createApp(manifest: AppManifest) {
@@ -11,6 +13,7 @@ export function createApp(manifest: AppManifest) {
 
   // Register modules
   app.register(devicesModuleFactory(deps, deviceSchemaProvider, new Driver(deps))());
+  app.register(triggersModuleFactory(deps, triggerSchemaProvider)());
 
   return { app, deps };
 }
