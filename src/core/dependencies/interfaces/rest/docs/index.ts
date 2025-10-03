@@ -1,5 +1,5 @@
 import type { OpenAPI3 } from "openapi-typescript";
-import type { RouteInterface } from "../index";
+import type { Route } from "@/core/dependencies/interfaces/rest";
 
 class DocumentGenerator {
     name: string;
@@ -10,7 +10,7 @@ class DocumentGenerator {
         this.version = version;
     }
 
-    generate(routes: RouteInterface[]): OpenAPI3 {
+    generate(routes: Route[]): OpenAPI3 {
         const pathsObject: OpenAPI3["paths"] = routes.reduce((acc, route) => {
             if (!acc) {
                 acc = {} as OpenAPI3["paths"];
@@ -29,7 +29,7 @@ class DocumentGenerator {
         } as OpenAPI3
     }
 
-    handlePath(route: RouteInterface): OpenAPI3["paths"][keyof OpenAPI3["paths"]] {
+    handlePath(route: Route): OpenAPI3["paths"][keyof OpenAPI3["paths"]] {
         const operation: OpenAPI3["paths"] = {
             summary: route.summary,
             description: route.description,
