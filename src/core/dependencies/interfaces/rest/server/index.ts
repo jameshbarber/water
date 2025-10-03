@@ -3,8 +3,8 @@ import { Route } from "./routes";
 
 export interface ServerAdapter {
     register(module: Module<any>): void;
-    use(route: Route): void;
-    mountRoutes(routes: Route[]): void;
+    createRoute(route: Route): void;
+    createRoutes(routes: Route[]): void;
     getRoutes(): Route[];
-    start(): void;
+    start(port: number, host: string): void;
 }

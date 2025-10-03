@@ -8,14 +8,10 @@ import { createCrudRoutes } from "./router";
 export class ExpressServerAdapter implements ServerAdapter {
     server?: Express;
     deps: Deps;
-    port: number;
-    host: string;
     private routes: Route[] = [];
 
-    constructor(deps: Deps, port: number, host: string) {
+    constructor(deps: Deps) {
         this.deps = deps;
-        this.port = port;
-        this.host = host;
         this.server = express();
         this.server.use(express.json());
     }
@@ -24,11 +20,10 @@ export class ExpressServerAdapter implements ServerAdapter {
         const moduleSchemaProvider = module.schema
         const schema = moduleSchemaProvider.getSchema(module.name)
         this.deps.logger?.info(`Registering module ${module.name} with schemas ${JSON.stringify(schema)}`);
-        const routes = createCrudRoutes(module);
-        routes.forEach(r => this.use(r));
+        this.createRoutes(createCrudRoutes(module));
     }
 
-    use(route: Route) {
+    createRoute(route: Route) {
         const { path, method, handler } = route;
         const app = this.server;
         if (!app) return;
@@ -48,10 +43,10 @@ export class ExpressServerAdapter implements ServerAdapter {
         // TODO: Add OpenAPI documentation generation
     }
 
-    mountRoutes(routes: Route[]) {
+    createRoutes(routes: Route[]) {
         routes.forEach(r => {
             this.deps.logger?.info(`Mounting route ${r.path} ${r.method}`);
-            this.use(r);
+            this.createRoute(r);
         });
     }
 
@@ -59,12 +54,11 @@ export class ExpressServerAdapter implements ServerAdapter {
         return [...this.routes];
     }
 
-    start() {
-        this.deps.logger?.info(`Starting API on ${this.host}:${this.port}`);
+    start(port?: number, host?: string) {
+        this.deps.logger?.info(`Starting API`);
         this.server = this.server ?? express();
         this.deps.logger?.info(`Server: ${this.server}`);
-        this.server.listen(this.port, this.host);
+        this.server.listen(port ?? 3000, host ?? "0.0.0.0");
         this.deps.logger?.info(`API ready`);
     }
-
 }       
