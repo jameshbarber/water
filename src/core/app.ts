@@ -1,4 +1,5 @@
 import { Deps } from "@/deps";
+import fs from "fs";
 import Module, { ModuleConfig, ModuleManifestConfig } from "./modules";
 
 export interface ManifestModules {
@@ -58,11 +59,24 @@ class App {
         this.moduleConfigs[name] = module;
         if (this.manifest.interfaces?.rest?.enabled) {
             this.deps.rest?.register(module);
+            // Mount any custom routes declared on the module
+            if ((module as any).customRoutes?.length) {
+                this.deps.rest?.createRoutes?.((module as any).customRoutes);
+            }
         }
+    }
+
+
+    generateServerWelcome() {
+        return `
+        Welcome to ${this.manifest.name}
+        URL: http://${this.manifest.interfaces.rest?.host}:${this.manifest.interfaces.rest?.port}
+        `;
     }
 
     start() {
         if (this.manifest.interfaces?.rest?.enabled) {
+            this.deps.rest?.mountSettingsApi?.();
             this.deps.rest?.start(this.manifest.interfaces.rest.port, this.manifest.interfaces.rest.host);
         }
         if (this.manifest.interfaces?.mcp?.enabled) {
@@ -79,11 +93,28 @@ class App {
             this.deps.database?.repo?.("settings").create?.({
                 data: {
                     id: "name",
-                    value: JSON.stringify(this.manifest.name)
+                    value: this.manifest.name
                 },
             });
         } catch {
             // ignore in tests without database
+        }
+
+        const pollMs = Number(process.env.SETTINGS_POLL_MS || 0);
+        if (pollMs > 0) {
+            const t = setInterval(() => {
+                try {
+                    const raw = fs.existsSync("db/settings.json") ? fs.readFileSync("db/settings.json", "utf8") : "{}";
+                    const parsed = JSON.parse(raw || "{}");
+                    const next = parsed?.manifest;
+                    if (next && typeof next === "object" && next.name && next.version) {
+                        this.manifest = next;
+                    }
+                } catch {
+                    // swallow
+                }
+            }, pollMs);
+            (t as any)?.unref?.();
         }
     }
 }

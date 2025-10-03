@@ -3,6 +3,7 @@ import { z } from "zod";
 
 const readingsSchema = z.object({
     id: z.string(),
+    deviceId: z.string(),
     value: z.number(),
     timestamp: z.string(),
 });

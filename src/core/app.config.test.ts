@@ -54,7 +54,7 @@ describe("App manifest honoring", () => {
     createDepsMock.mockClear();
   });
 
-  it("starts only REST when enabled and MCP disabled", () => {
+  it("starts only REST when enabled and MCP disabled", async () => {
     const manifest: AppManifest = {
       name: "water",
       version: "1.0.0",
@@ -69,20 +69,17 @@ describe("App manifest honoring", () => {
       },
     };
 
-    const { app } = createApp(manifest);
+    const { app } = await createApp(manifest);
     app.start();
 
     expect(restStart).toHaveBeenCalledWith(3001, "127.0.0.1");
     expect(mcpStart).not.toHaveBeenCalled();
-    // Deps created with exact manifest
     expect(createDepsMock).toHaveBeenCalledWith(manifest);
-    // App retains manifest exactly (identity check OK since we pass-through)
     expect(app.manifest).toBe(manifest);
-    // When REST enabled, module registration should call rest.register twice (devices, triggers)
     expect(restRegister).toHaveBeenCalledTimes(2);
   });
 
-  it("starts MCP when enabled and REST disabled", () => {
+  it("starts MCP when enabled and REST disabled", async () => {
     const manifest: AppManifest = {
       name: "water",
       version: "1.0.0",
@@ -97,18 +94,17 @@ describe("App manifest honoring", () => {
       },
     };
 
-    const { app } = createApp(manifest);
+    const { app } = await createApp(manifest);
     app.start();
 
     expect(mcpStart).toHaveBeenCalled();
     expect(restStart).not.toHaveBeenCalled();
     expect(createDepsMock).toHaveBeenCalledWith(manifest);
     expect(app.manifest).toBe(manifest);
-    // With REST disabled, modules should not be registered onto the REST adapter
     expect(restRegister).not.toHaveBeenCalled();
   });
 
-  it("starts both interfaces when both enabled", () => {
+  it("starts both interfaces when both enabled", async () => {
     const manifest: AppManifest = {
       name: "water",
       version: "1.0.0",
@@ -123,7 +119,7 @@ describe("App manifest honoring", () => {
       },
     };
 
-    const { app } = createApp(manifest);
+    const { app } = await createApp(manifest);
     app.start();
 
     expect(restStart).toHaveBeenCalledWith(4000, "0.0.0.0");
@@ -133,7 +129,7 @@ describe("App manifest honoring", () => {
     expect(restRegister).toHaveBeenCalledTimes(2);
   });
 
-  it("preserves name and version and passes through unchanged", () => {
+  it("preserves name and version and passes through unchanged", async () => {
     const manifest: AppManifest = {
       name: "custom-name",
       version: "9.9.9",
@@ -152,7 +148,7 @@ describe("App manifest honoring", () => {
       },
     };
 
-    const { app } = createApp(manifest);
+    const { app } = await createApp(manifest);
     expect(app.name).toBe("custom-name");
     expect(app.manifest.version).toBe("9.9.9");
     expect(app.manifest).toBe(manifest);

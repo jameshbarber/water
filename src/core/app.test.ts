@@ -1,6 +1,9 @@
 import { AppManifest } from "@/core/app";
 import { createApp } from "@/index";
 
+// Ensure background poller is disabled in tests
+process.env.SETTINGS_POLL_MS = "0";
+
 // Mock deps to avoid real IO and to assert calls
 jest.mock("@/deps", () => {
   return {
@@ -43,7 +46,7 @@ describe("App initialization", () => {
     jest.clearAllMocks();
   });
 
-  it("creates the app and registers core modules", () => {
+  it("creates the app and registers core modules", async () => {
     const manifest: AppManifest = {
       name: "water",
       version: "1.0.0",
@@ -55,16 +58,17 @@ describe("App initialization", () => {
       modules: {
         devices: { schema: "zod", store: "json" },
         triggers: { schema: "zod", store: "json" },
+        settings: { schema: "zod", store: "json" },
       },
     };
 
-    const { app, deps } = createApp(manifest);
+    const { app, deps } = await createApp(manifest);
 
     expect(app.name).toBe("water");
     expect(Object.keys(app.moduleConfigs)).toEqual(
       expect.arrayContaining(["devices", "triggers"])
     );
-    expect((deps.rest as any).register).toHaveBeenCalledTimes(2);
+    expect((deps.rest as any).register).toHaveBeenCalledTimes(3);
   });
 });
 

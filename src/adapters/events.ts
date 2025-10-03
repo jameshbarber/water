@@ -31,4 +31,4 @@ class SimpleEventBus extends EventBus {
     }
 }
 
-export default SimpleEventBus;
+export { SimpleEventBus };

@@ -1,7 +1,7 @@
 import { Database, Repository, Where } from "@/core/dependencies/db";
 import { Pool } from "pg";
 
-class PgRepository<T extends { id?: string }> implements Repository<T> {
+export class PgRepository<T extends { id?: string }> implements Repository<T> {
     table: string;
     private pool: Pool;
 

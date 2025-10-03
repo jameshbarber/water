@@ -7,7 +7,6 @@ describe("McpServer", () => {
         eventBus: makeEventBus(),
         database: makeDbSchema(),
         logger: makeLogger(),
-        makeModuleDataStore: jest.fn()
     };
 
     const mockTool = {

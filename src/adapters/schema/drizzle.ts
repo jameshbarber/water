@@ -7,7 +7,11 @@ export class DrizzleSchemaProvider implements SchemaProvider<DrizzleTable> {
     private tables: Map<string, DrizzleTable>;
 
     constructor(table?: DrizzleTable) {
-        this.tables = new Map(Object.entries(table ?? {}));
+        this.tables = new Map();
+        if (table) {
+            // Treat provided table as the default table
+            this.tables.set("default", table);
+        }
     }
 
     create(table: DrizzleTable): void {

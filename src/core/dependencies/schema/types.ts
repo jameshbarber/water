@@ -6,7 +6,7 @@ export interface EntitySchema<TCreate, TRead, TQuery> {
     query?: import("zod").ZodType<TQuery>;
 }
 
-export interface SchemaProvider {
-    getSchema(entityName: string): EntitySchema<any, any, any> | undefined;
+export interface SchemaProvider<T> {
+    getSchema(entityName?: string): EntitySchema<T, T, Partial<T>> | undefined;
     listSchemas(): string[];
 }

@@ -2,7 +2,7 @@ import { Where } from "@/core/dependencies/db";
 import AppError from "@/core/error";
 import { Route } from "@/core/dependencies/interfaces/rest";
 import { Deps } from "@/deps";
-import { SchemaProvider } from "@/adapters/schema/types";
+import { SchemaProvider } from "../dependencies";
 import { z } from "zod";
 
 export interface ModuleManifestConfig {
@@ -10,9 +10,7 @@ export interface ModuleManifestConfig {
 }
 
 export interface ModuleConfig<T> extends ModuleManifestConfig {
-    schemas?: SchemaProvider<T>;
-    // tolerate shorthand in tests/manifests
-    schema?: string;
+    schema?: SchemaProvider<T>;
     store?: string;
 }
 
@@ -21,12 +19,13 @@ export default class Module<T extends { id: string }> {
     name: string;
     deps: Deps;
     schemas: SchemaProvider<T>;
-    config: ModuleManifestConfig;
+    config: ModuleConfig<T>;
+    customRoutes: Route[] = [];
 
     constructor(config: ModuleConfig<T>, deps: Deps) {
         this.deps = deps;
         this.name = config.name;
-        this.schemas = (config.schemas as any) ?? { getSchema: () => undefined } as any;
+        this.schemas = (config.schema as any) || ({ getSchema: () => undefined } as any);
         this.config = config;
     }
 
@@ -62,7 +61,7 @@ export default class Module<T extends { id: string }> {
     async update(id: string, data: Partial<T>): Promise<T | null> {
         const store = this.deps.database.repo<T>((this.schemas as any)?.getTable?.() ?? this.name);
         const schema = this.schemas.getSchema();
-        if (schema?.update) (schema.update as z.ZodType<any>).parse(data);
+        if (schema?.create) (schema.create as z.ZodType<any>).parse(data);
         const val = await store.update({ where: { id } as Where<T>, data })
         if (!val) {
             throw new AppError(`${this.name} ${id} not found`, 404, `${this.name}.not_found`);
@@ -81,6 +80,6 @@ export default class Module<T extends { id: string }> {
     }
 
     addRoute(route: Route) {
-        this.deps.rest?.createRoute(route);
+        this.customRoutes.push(route);
     }
 }

@@ -1,6 +1,5 @@
 import Module from "@/core/modules";
 import { Route } from "./routes";
-import { OpenAPI3 } from "openapi-typescript";
 
 export interface ServerAdapter {
     register(module: Module<any>): void;
@@ -8,5 +7,7 @@ export interface ServerAdapter {
     createRoutes(routes: Route[]): void;
     getRoutes(): Route[];
     start(port?: number, host?: string): void;
-    getOpenAPISchema(): OpenAPI3;
+    generateDocs(): any;
+    serveDocs(): void;
+    mountSettingsApi?(): void;
 }
