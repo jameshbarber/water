@@ -1,21 +1,12 @@
-import z from "zod"
 import { Deps } from "@/deps";
-import { DatabaseAdapter } from "./dependencies/db";
-import Module from "./modules";
+import Module, { ModuleConfig, ModuleManifestConfig } from "./modules";
 
 export interface ManifestModules {
-    [key: string]: {
-        schema: string;
-        store: string;
-    };
+    [key: string]: ModuleManifestConfig;
 }
 
 export interface AppModuleConfigs {
-    [key: string]: {
-        name: string;
-        schema: z.Schema;
-        store: DatabaseAdapter<any>;
-    };
+    [key: string]: ModuleConfig<any>;
 }
 
 interface InterfaceConfiguration {
@@ -29,17 +20,23 @@ interface RestInterfaceConfiguration {
 }
 
 
+export interface StoreConfiguration {
+    type: "json" | "csv" | "drizzle" | "postgres";
+    url: string;
+}
+
+
 export interface AppManifest {
     name: string;
     version: string;
+    store?: StoreConfiguration;
+    stores?: Record<string, { url: string; type: "json" | "csv" | "drizzle" | "postgres" }>;
+    dependencies?: { db?: string; schema?: string; events?: string };
     interfaces: {
         mcp?: InterfaceConfiguration;
         rest?: RestInterfaceConfiguration;
     };
-    dependencies: {
-        [key: string]: string;
-    };
-    modules: ManifestModules;
+    modules: Record<string, any>;
 }
 
 
@@ -57,11 +54,8 @@ class App {
     }
 
     register<T extends { id: string }>(module: Module<T>) {
-        const {name, schema, store} = module;
-        if (!schema.getSchema()?.read) {
-            throw new Error(`Schema for ${name} is not defined`);
-        }
-        this.moduleConfigs[name] = { schema: schema.getSchema()?.read as z.Schema, store, name };
+        const {name} = module;
+        this.moduleConfigs[name] = module;
         if (this.manifest.interfaces?.rest?.enabled) {
             this.deps.rest?.register(module);
         }
@@ -73,6 +67,23 @@ class App {
         }
         if (this.manifest.interfaces?.mcp?.enabled) {
             this.deps.mcp?.start();
+        }
+
+        try {
+            this.deps.database?.repo?.("settings").create?.({
+                data: {
+                    id: "manifest",
+                    value: JSON.stringify(this.manifest)
+                },
+            });
+            this.deps.database?.repo?.("settings").create?.({
+                data: {
+                    id: "name",
+                    value: JSON.stringify(this.manifest.name)
+                },
+            });
+        } catch {
+            // ignore in tests without database
         }
     }
 }
