@@ -3,7 +3,7 @@ import type { SchemaProvider, EntitySchema } from "./types";
 
 type DrizzleTable = any;
 
-export class DrizzleSchemaProvider implements SchemaProvider {
+export class DrizzleSchemaProvider implements SchemaProvider<DrizzleTable> {
     private tables: Map<string, DrizzleTable>;
 
     constructor(table?: DrizzleTable) {
@@ -34,6 +34,10 @@ export class DrizzleSchemaProvider implements SchemaProvider {
             create: createSchema,
             read: readSchema,
         } as EntitySchema<any, any, any, any>;
+    }
+
+    getTable(): any | undefined {
+        return this.tables.get("default");
     }
 
     listSchemas(): string[] {
