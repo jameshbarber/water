@@ -49,7 +49,7 @@ const createCrudRoutes = (module: Module<any>): Route[] => {
             },
         },
         {
-            path: `/${module.name}`,
+            path: `/${module.name}/{id}`,
             summary: `Update ${module.name}`,
             description: `Update a ${module.name}`,
             method: "put" as Method,
@@ -60,7 +60,7 @@ const createCrudRoutes = (module: Module<any>): Route[] => {
             },
         },
         {
-            path: `/${module.name}`,
+            path: `/${module.name}/{id}`,
             summary: `Delete ${module.name}`,
             description: `Delete a ${module.name}`,
             method: "delete" as Method,
