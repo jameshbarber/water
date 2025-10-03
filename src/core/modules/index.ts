@@ -1,40 +1,38 @@
-import { DatabaseAdapter, Where } from "@/core/dependencies/db";
-import { SchemaProvider } from "@/adapters/schema/types";
-import { EventBus } from "@/core/dependencies/events";
+import { Where } from "@/core/dependencies/db";
 import AppError from "@/core/error";
-import App from "@/core/app";
 import { Route } from "@/core/dependencies/interfaces/rest";
-import { Logger } from "@/core/dependencies/logger";
+import { Deps } from "@/deps";
+import { SchemaProvider } from "@/adapters/schema/types";
+import { z } from "zod";
 
-export interface ModuleConfig<T extends { id: string }> {
+export interface ModuleManifestConfig {
     name: string;
-    store: DatabaseAdapter<T>;
-    eventBus: EventBus;
-    schema: SchemaProvider;
-    app?: App;   
-    logger: Logger;
+}
+
+export interface ModuleConfig<T> extends ModuleManifestConfig {
+    schemas?: SchemaProvider<T>;
+    // tolerate shorthand in tests/manifests
+    schema?: string;
+    store?: string;
 }
 
 export default class Module<T extends { id: string }> {
 
     name: string;
-    store: DatabaseAdapter<T>;
-    eventBus: EventBus;
-    schema: SchemaProvider;
-    app?: App;
-    logger?: Logger;
-    
-    constructor(config: ModuleConfig<T>) {
-        this.store = config.store;
+    deps: Deps;
+    schemas: SchemaProvider<T>;
+    config: ModuleManifestConfig;
+
+    constructor(config: ModuleConfig<T>, deps: Deps) {
+        this.deps = deps;
         this.name = config.name;
-        this.eventBus = config.eventBus;
-        this.schema = config.schema;
-        this.app = config.app;
-        this.logger = config.logger;
+        this.schemas = (config.schemas as any) ?? { getSchema: () => undefined } as any;
+        this.config = config;
     }
 
     async findOne(id: string): Promise<T> {
-        const result = await this.store.findOne({
+        const store = this.deps.database.repo<T>((this.schemas as any)?.getTable?.() ?? this.name);
+        const result = await store.findOne({
             where: { id } as Where<T>
         })
         if (!result) {
@@ -44,38 +42,38 @@ export default class Module<T extends { id: string }> {
     }
 
     findMany(where: Where<T>): Promise<T[]> {
-        return this.store.findMany({
-            where: where
-        })
+        const store = this.deps.database.repo<T>((this.schemas as any)?.getTable?.() ?? this.name);
+        const schema = this.schemas.getSchema();
+        if (schema?.query) (schema.query as z.ZodType<any>).parse(where);
+        return store.findMany({ where })
     }
 
     async create(data: T): Promise<T> {
-        const val = await this.store.create({
-            data: data
-        })
-        if (this?.logger?.debug) {  
-            this.logger.debug(`Emitting event: ${this.name}.created ${JSON.stringify(val)}`);
-        }
-        this.eventBus.emit(`${this.name}.created`, val);
+        const store = this.deps.database.repo<T>((this.schemas as any)?.getTable?.() ?? this.name);
+        const schema = this.schemas.getSchema();
+        if (schema?.create) (schema.create as z.ZodType<any>).parse(data);
+        const val = await store.create({ data })
+
+        this.deps.logger.debug(`Emitting event: ${this.name}.created ${JSON.stringify(val)}`);
+        this.deps.eventBus.emit(`${this.name}.created`, val);
         return val;
     }
     
     async update(id: string, data: Partial<T>): Promise<T | null> {
-        const val = await this.store.update({
-            where: { id } as Where<T>,
-            data: data
-        })
+        const store = this.deps.database.repo<T>((this.schemas as any)?.getTable?.() ?? this.name);
+        const schema = this.schemas.getSchema();
+        if (schema?.update) (schema.update as z.ZodType<any>).parse(data);
+        const val = await store.update({ where: { id } as Where<T>, data })
         if (!val) {
             throw new AppError(`${this.name} ${id} not found`, 404, `${this.name}.not_found`);
         }
-        this.eventBus.emit(`${this.name}.updated`, val);
+        this.deps.eventBus.emit(`${this.name}.updated`, val);
         return val;
     }
 
     async delete(id: string): Promise<T | null> {
-        const val = await this.store.delete({
-            where: { id } as Where<T>
-        })
+        const store = this.deps.database.repo<T>((this.schemas as any)?.getTable?.() ?? this.name);
+        const val = await store.delete({ where: { id } as Where<T> })
         if (!val) {
             throw new AppError(`${this.name} ${id} not found`, 404, `${this.name}.not_found`);
         }
@@ -83,6 +81,6 @@ export default class Module<T extends { id: string }> {
     }
 
     addRoute(route: Route) {
-        this.app?.deps.rest?.createRoute(route);
+        this.deps.rest?.createRoute(route);
     }
 }
