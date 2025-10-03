@@ -17,14 +17,13 @@ Water makes it effortless to facilitate the control of & collection of readings 
 This codebase works with the concept of an `App` which is initialised using a `manifest.ts` file containing JSON specs. `Modules` are core CRUD entities, stored in a `Store` of your choice. 
 
 ## Storage
-You can store data in pretty much any form using the adapter pattern, and customise this per module. Built in support for local storage in the form of JSON & CSV files, as well as remote storage in the form of POSTGRES and TimescaleDB. 
+You can store data in pretty much any form using the adapter pattern, and customise this per module. Built in support for local storage in the form of JSON & CSV files, as well as remote storage in the form of POSTGRES and TimescaleDB. To implement a custom storage scheme, simply implement the `DatabaseAdapter` interface. 
 
-## Control Protocols
-You can use pretty much any protocol to integrate devices such as sensors and actuators. Out-the-box support for MQTT, GPIO (via polling) & HTTP. 
+## Driver
+You can use pretty much any protocol to integrate devices such as sensors and actuators. Out-the-box support for MQTT, GPIO (via polling) & HTTP. To implement a custom driver, such as Serial, extend the `DriverAdapter` interface
 
 ## Interfaces
-You can access the hub over pretty much any interface. Out-the-box support for REST & MCP servers, as well as a typed API client. 
-
+You can access the hub over pretty much any interface. Out-the-box support for REST & MCP servers, as well as a typed API client. To add a custom interface, such as GraphQL, extend the `InterfaceAdapter` type.
 
 # Stack
 - NodeJS + Typescript
