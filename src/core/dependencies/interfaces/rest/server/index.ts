@@ -9,4 +9,5 @@ export interface ServerAdapter {
     start(port?: number, host?: string): void;
     generateDocs(): any;
     serveDocs(): void;
+    mountSettingsApi?(): void;
 }

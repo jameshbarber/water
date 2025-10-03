@@ -2,7 +2,7 @@ import { Where } from "@/core/dependencies/db";
 import AppError from "@/core/error";
 import { Route } from "@/core/dependencies/interfaces/rest";
 import { Deps } from "@/deps";
-import { SchemaProvider } from "@/core/dependencies";
+import { SchemaProvider } from "../dependencies";
 import { z } from "zod";
 
 export interface ModuleManifestConfig {
@@ -20,6 +20,7 @@ export default class Module<T extends { id: string }> {
     deps: Deps;
     schemas: SchemaProvider<T>;
     config: ModuleConfig<T>;
+    customRoutes: Route[] = [];
 
     constructor(config: ModuleConfig<T>, deps: Deps) {
         this.deps = deps;
@@ -41,14 +42,14 @@ export default class Module<T extends { id: string }> {
 
     findMany(where: Where<T>): Promise<T[]> {
         const store = this.deps.database.repo<T>((this.schemas as any)?.getTable?.() ?? this.name);
-        const schema = this.schemas.getSchema(this.name);
+        const schema = this.schemas.getSchema();
         if (schema?.query) (schema.query as z.ZodType<any>).parse(where);
         return store.findMany({ where })
     }
 
     async create(data: T): Promise<T> {
         const store = this.deps.database.repo<T>((this.schemas as any)?.getTable?.() ?? this.name);
-        const schema = this.schemas.getSchema(this.name);
+        const schema = this.schemas.getSchema();
         if (schema?.create) (schema.create as z.ZodType<any>).parse(data);
         const val = await store.create({ data })
 
@@ -59,7 +60,7 @@ export default class Module<T extends { id: string }> {
     
     async update(id: string, data: Partial<T>): Promise<T | null> {
         const store = this.deps.database.repo<T>((this.schemas as any)?.getTable?.() ?? this.name);
-        const schema = this.schemas.getSchema(this.name);
+        const schema = this.schemas.getSchema();
         if (schema?.create) (schema.create as z.ZodType<any>).parse(data);
         const val = await store.update({ where: { id } as Where<T>, data })
         if (!val) {
@@ -79,6 +80,6 @@ export default class Module<T extends { id: string }> {
     }
 
     addRoute(route: Route) {
-        this.deps.rest?.createRoute(route);
+        this.customRoutes.push(route);
     }
 }

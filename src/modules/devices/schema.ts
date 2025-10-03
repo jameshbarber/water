@@ -5,6 +5,7 @@ import { z } from "zod";
 
 const deviceTableSchema = pgTable("devices", {
     id: uuid("id").notNull(),
+    image: text("image").notNull(),
     role: text("role").notNull(),
     driver: text("driver").notNull(),
     address: jsonb("address").notNull(),

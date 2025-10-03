@@ -13,12 +13,12 @@ const moduleFactory = (deps: Deps, CustomModuleConstructor?: typeof Module) => {
   }
 }
 
-export function createApp(manifest: AppManifest) {
+export async function createApp(manifest: AppManifest) {
   const deps = createDeps(manifest);
   const app = new App(manifest, deps);
   const modules = Object.keys(manifest.modules);
 
-  modules.forEach((module) => { 
+  modules.forEach((module) => {
     const m = moduleFactory(deps)(Object.assign({ name: module }, manifest.modules[module] as any));
     app.register(m);
   });

@@ -48,11 +48,11 @@ describe("JsonFileAdapter", () => {
   it("creates empty JSON store if file not exists", () => {
     const adapter = new JsonFileAdapter(TEST_FILE, logger, "test");
     const content = fs.readFileSync(TEST_FILE, "utf8");
-    expect(JSON.parse(content)).toEqual({ items: [] });
+    expect(JSON.parse(content)).toEqual({});
   });
 
   it("uses existing data if file exists", () => {
-    const initialData = { items: [{ id: "1", name: "Test" }] };
+    const initialData = { test: { items: [{ id: "1", name: "Test" }] } } as any;
     fs.writeFileSync(TEST_FILE, JSON.stringify(initialData));
     const adapter = new JsonFileAdapter(TEST_FILE, logger, "test");
     const found = adapter.findOne({ where: { id: "1" } });
@@ -65,7 +65,7 @@ describe("JsonFileAdapter", () => {
     const created = await adapter.create({ data: { id: "1", name: "Test" } });
     const content = fs.readFileSync(TEST_FILE, "utf8");
     expect(JSON.parse(content)).toEqual({ 
-      items: [{ id: "1", name: "Test" }] 
+      test: { items: [{ id: "1", name: "Test" }] }
     });
     expect(created.id).toEqual("1");
     const found = await adapter.findOne({ where: { id: "1" } });

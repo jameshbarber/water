@@ -5,7 +5,10 @@
   "main": "index.js",
   "scripts": {
     "dev": "ts-node -r tsconfig-paths/register index.ts",
-    "test:unit": "jest"
+    "test:unit": "jest",
+    "sdk:generate": "pnpm exec tsx packages/sdk/scripts/generate.ts",
+    "sdk:build": "pnpm --prefix packages/sdk run build",
+    "post:readings": "pnpm exec tsx scripts/post-readings.ts"
   },
   "keywords": [],
   "author": "",

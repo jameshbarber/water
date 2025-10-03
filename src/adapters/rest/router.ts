@@ -16,12 +16,17 @@ const createCrudRoutes = (module: Module<any>): Route[] => {
 
     const routes = [
         {
-            path: `/${module.name}/:id`,
+            path: `/${module.name}/{id}`,
             summary: `Get ${module.name}`,
             description: `Get a ${module.name}`,
             method: "get" as Method,
+            inputSchemas: {
+                params: { id: z.string() }
+            },
             handler: async (req: any, res: any) => {
-                validateOrThrow(module.schemas.getSchema(module.name)?.read, req.params.id, `Invalid ${module.name} id`);
+                const prov: any = module.schemas as any;
+                const entity = typeof prov?.getSchema === "function" ? prov.getSchema() : prov;
+                validateOrThrow(entity?.read, req.params.id, `Invalid ${module.name} id`);
                 const result = await module.findOne(req.params.id);
                 return res.json(result);
             },
@@ -31,8 +36,15 @@ const createCrudRoutes = (module: Module<any>): Route[] => {
             description: `List all ${module.name}`,
             path: `/${module.name}`,
             method: "get" as Method,
+            inputSchemas: (() => {
+                const prov: any = module.schemas as any;
+                const entity = typeof prov?.getSchema === "function" ? prov.getSchema() : prov;
+                return { query: entity?.query as any };
+            })(),
             handler: async (req: any, res: any) => {
-                validateOrThrow(module.schemas.getSchema(module.name)?.query, req.query, `Invalid ${module.name} query`);
+                const prov: any = module.schemas as any;
+                const entity = typeof prov?.getSchema === "function" ? prov.getSchema() : prov;
+                validateOrThrow(entity?.query, req.query, `Invalid ${module.name} query`);
                 const result = await module.findMany(req.query);
                 return res.json(result);
             },
@@ -42,8 +54,15 @@ const createCrudRoutes = (module: Module<any>): Route[] => {
             summary: `Create ${module.name}`,
             description: `Create a new ${module.name}`,
             method: "post" as Method,
+            inputSchemas: (() => {
+                const prov: any = module.schemas as any;
+                const entity = typeof prov?.getSchema === "function" ? prov.getSchema() : prov;
+                return { body: entity?.create as any };
+            })(),
             handler: async (req: any, res: any) => {
-                validateOrThrow(module.schemas.getSchema(module.name)?.create, req.body, `Invalid ${module.name} body`);
+                const prov: any = module.schemas as any;
+                const entity = typeof prov?.getSchema === "function" ? prov.getSchema() : prov;
+                validateOrThrow(entity?.create, req.body, `Invalid ${module.name} body`);
                 const result = await module.create(req.body);
                 return res.json(result);
             },
@@ -53,8 +72,15 @@ const createCrudRoutes = (module: Module<any>): Route[] => {
             summary: `Update ${module.name}`,
             description: `Update a ${module.name}`,
             method: "put" as Method,
+            inputSchemas: (() => {
+                const prov: any = module.schemas as any;
+                const entity = typeof prov?.getSchema === "function" ? prov.getSchema() : prov;
+                return { params: { id: z.string() }, body: entity?.create as any };
+            })(),
             handler: async (req: any, res: any) => {
-                validateOrThrow(module.schemas.getSchema(module.name)?.create, req.body, `Invalid ${module.name} body`);
+                const prov: any = module.schemas as any;
+                const entity = typeof prov?.getSchema === "function" ? prov.getSchema() : prov;
+                validateOrThrow(entity?.create, req.body, `Invalid ${module.name} body`);
                 const result = await module.update(req.params.id, req.body);
                 return res.json(result);
             },
@@ -64,6 +90,9 @@ const createCrudRoutes = (module: Module<any>): Route[] => {
             summary: `Delete ${module.name}`,
             description: `Delete a ${module.name}`,
             method: "delete" as Method,
+            inputSchemas: {
+                params: { id: z.string() }
+            },
             handler: async (req: any, res: any) => {
                 validateOrThrow(undefined, req.body, `Invalid ${module.name} body`);
                 const result = await module.delete(req.params.id);

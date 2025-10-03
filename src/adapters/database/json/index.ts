@@ -7,6 +7,7 @@ import { Logger } from "@/core/dependencies/logger";
 
 
 type JsonStore<T> = { items: T[] };
+type RootStore = Record<string, JsonStore<any>>;
 
 export class JsonFileAdapter<T extends { id?: string }> implements Repository<T> {
     private filePath: string;
@@ -29,17 +30,38 @@ export class JsonFileAdapter<T extends { id?: string }> implements Repository<T>
         const dir = path.dirname(this.filePath);
         if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
         if (!fs.existsSync(this.filePath)) {
-            fs.writeFileSync(this.filePath, JSON.stringify({ items: [] }));
+            fs.writeFileSync(this.filePath, JSON.stringify({}));
         }
     }
 
-    private read(): JsonStore<T> {
+    private readRoot(): RootStore {
         const raw = fs.readFileSync(this.filePath, "utf8");
-        return JSON.parse(raw || "{\"items\":[]}");
+        try {
+            const parsed = JSON.parse(raw || "{}");
+            return (parsed && typeof parsed === "object") ? parsed : {};
+        } catch {
+            return {};
+        }
+    }
+
+    private writeRoot(root: RootStore) {
+        fs.writeFileSync(this.filePath, JSON.stringify(root));
+    }
+
+    private readTable(): JsonStore<T> {
+        const root = this.readRoot();
+        const existing = root[this.table] as JsonStore<T> | undefined;
+        if (existing) return existing;
+        const store = { items: [] } as JsonStore<T>;
+        root[this.table] = store as any;
+        this.writeRoot(root);
+        return store;
     }
 
     private write(store: JsonStore<T>) {
-        fs.writeFileSync(this.filePath, JSON.stringify(store));
+        const root = this.readRoot();
+        root[this.table] = store;
+        this.writeRoot(root);
     }
 
     private matchWhere(item: T, where?: Where<T>): boolean {
@@ -48,42 +70,53 @@ export class JsonFileAdapter<T extends { id?: string }> implements Repository<T>
     }
 
     async findOne({ where }: { where: Where<T> }): Promise<T | null> {
-        const { items } = this.read();
+        const { items } = this.readTable();
         return items.find(i => this.matchWhere(i, where)) ?? null;
     }
 
     async findMany({ where }: { where?: Where<T> }): Promise<T[]> {
-        const { items } = this.read();
+        const { items } = this.readTable();
         return items.filter(i => this.matchWhere(i, where));
     }
 
     async create({ data }: { data: T | Omit<T, "id"> }): Promise<T> {
-        const store = this.read();
+        const root = this.readRoot();
+        const store = (root[this.table] ?? { items: [] }) as JsonStore<T>;
         const item = (data as T);
         if ((item as any).id === undefined || (item as any).id === null) {
             (item as any).id = randomUUID();
         }
-        store.items.push(item);
-        this.write(store);
+        const idx = store.items.findIndex(i => (i as any).id === (item as any).id);
+        if (idx >= 0) {
+            store.items[idx] = item;
+        } else {
+            store.items.push(item);
+        }
+        root[this.table] = store as any;
+        this.writeRoot(root);
         return item;
     }
 
     async update({ where, data }: { where: Where<T>; data: Partial<T> }): Promise<T | null> {
-        const store = this.read();
+        const root = this.readRoot();
+        const store = (root[this.table] ?? { items: [] }) as JsonStore<T>;
         const idx = store.items.findIndex(i => this.matchWhere(i, where));
         if (idx === -1) return null;
         const updated = { ...store.items[idx], ...data } as T;
         store.items[idx] = updated;
-        this.write(store);
+        root[this.table] = store as any;
+        this.writeRoot(root);
         return updated;
     }
 
     async delete({ where }: { where: Where<T> }): Promise<T | null> {
-        const store = this.read();
+        const root = this.readRoot();
+        const store = (root[this.table] ?? { items: [] }) as JsonStore<T>;
         const idx = store.items.findIndex(i => this.matchWhere(i, where));
         if (idx === -1) return null;
         const [removed] = store.items.splice(idx, 1);
-        this.write(store);
+        root[this.table] = store as any;
+        this.writeRoot(root);
         return removed ?? null;
     }
 }
@@ -94,10 +127,16 @@ export class JsonDatabase implements Database {
     constructor(filePath: string, logger: Logger) {
         this.filePath = filePath;
         this.logger = logger;
+        const dir = path.dirname(this.filePath);
+        if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
+        if (!fs.existsSync(this.filePath)) fs.writeFileSync(this.filePath, JSON.stringify({}));
     }
     async initialize(): Promise<void> { return; }
-    repo<T extends { id?: string }>(tableName: string): Repository<T> {
-        return new JsonFileAdapter<T>(this.filePath, this.logger, tableName);
+    repo<T extends { id?: string }>(source: any, tableName?: string): Repository<T> {
+        const table = (typeof source === "object" && source && (source as any)._ && (source as any)._.name)
+            ? (source as any)._.name
+            : (tableName ?? String(source));
+        return new JsonFileAdapter<T>(this.filePath, this.logger, table);
     }
 }
 
