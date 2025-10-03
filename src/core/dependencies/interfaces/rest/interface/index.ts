@@ -1,6 +1,6 @@
 import { AppInterface } from "../../types";
 import { Deps } from "@/deps";
-import { RouteInterface } from "../server/routes";
+import { Route } from "../server/routes";
 import { ServerAdapter } from "../server";
 
 export class RestInterface extends AppInterface {
@@ -13,7 +13,7 @@ export class RestInterface extends AppInterface {
         this.deps = deps;
     }
 
-    registerRoute(route: RouteInterface) {
+    registerRoute(route: Route) {
         this.server.use(route);
     }
 
