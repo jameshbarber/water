@@ -7,17 +7,17 @@ const levelOrder: Record<LogLevel, number> = {
   error: 40,
 };
 
-function shouldLog(current: LogLevel, incoming: LogLevel) {
+export function shouldLog(current: LogLevel, incoming: LogLevel) {
   return levelOrder[incoming] >= levelOrder[current];
 }
 
-function nowIso() {
+export function nowIso() {
   return new Date().toISOString();
 }
 
 export class ConsoleLogger implements Logger {
-  private level: LogLevel;
-  private context: Record<string, unknown>;
+  protected level: LogLevel;
+  protected context: Record<string, unknown>;
 
   constructor(level: LogLevel = 'info', context: Record<string, unknown> = {}) {
     this.level = level;
@@ -32,7 +32,7 @@ export class ConsoleLogger implements Logger {
     return new ConsoleLogger(this.level, { ...this.context, ...context });
   }
 
-  private format(level: LogLevel, message: string, meta: any[]): string {
+  protected format(level: LogLevel, message: string, meta: any[]): string {
     const base = { ts: nowIso(), level, msg: message, ...this.context } as Record<string, unknown>;
     if (meta && meta.length) base.meta = meta.length === 1 ? meta[0] : meta;
     return JSON.stringify(base);
