@@ -3,7 +3,7 @@ import { SchemaProvider } from "@/adapters/schema/types";
 import { EventBus } from "@/core/dependencies/events";
 import AppError from "../error";
 import App from "../app";
-import { RouteInterface } from "../dependencies/interfaces/rest";
+import { Route } from "../dependencies/interfaces/rest";
 
 export interface ModuleConfig<T extends { id: string }> {
     name: string;
@@ -76,7 +76,7 @@ export default class Module<T extends { id: string }> {
         return val;
     }
 
-    addRoute(route: RouteInterface) {
+    addRoute(route: Route) {
         this.app?.deps.rest?.use(route);
     }
 }

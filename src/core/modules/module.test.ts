@@ -1,5 +1,5 @@
 // tests/unit/module.test.ts
-import Module from "@/core/modules/module";
+import Module from "@/core/modules";
 import { makeDbSchema, makeEventBus, makeSchema, makeModuleConfig } from "@/test/mocks";
 
 // local schema used in tests can be set up through makeSchema if needed
