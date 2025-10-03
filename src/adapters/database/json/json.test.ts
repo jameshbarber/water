@@ -63,12 +63,12 @@ describe("JsonFileAdapter", () => {
   it("reads and writes JSON data correctly", async () => {
     const adapter = new JsonFileAdapter(TEST_FILE, logger);
     
-    await adapter.create({ data: { id: "1", name: "Test" } });
+    const created = await adapter.create({ data: { id: "1", name: "Test" } });
     const content = fs.readFileSync(TEST_FILE, "utf8");
     expect(JSON.parse(content)).toEqual({ 
       items: [{ id: "1", name: "Test" }] 
     });
-    
+    expect(created.id).toEqual("1");
     const found = await adapter.findOne({ where: { id: "1" } });
     expect(found).toEqual({ id: "1", name: "Test" });
   });
