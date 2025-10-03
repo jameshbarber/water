@@ -24,17 +24,17 @@ const manifest: AppManifest = {
     "modules": {
         "commands": {
             "name": "commands",
-            "schemas": commandSchemaProvider,
+            "schema": commandSchemaProvider,
             "constructor": CommandsModule
         },
         "devices": {
             "name": "devices",
-            "schemas": deviceSchemaProvider,
+            "schema": deviceSchemaProvider,
             "constructor": DevicesModule
         },
         "triggers": {
             "name": "triggers",
-            "schemas": triggerSchemaProvider
+            "schema": triggerSchemaProvider
         }
     }
 }
