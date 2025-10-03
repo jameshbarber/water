@@ -1,19 +1,27 @@
-import { createDeps } from "./deps";
+import { createDeps, Deps } from "./deps";
 import { AppManifest } from "./core/app";
 import App from "./core/app";
-import { deviceSchemaProvider } from "./modules/devices";
-import { devicesModuleFactory } from "./modules/devices/factory";
-import { triggerSchemaProvider, triggersModuleFactory } from "./modules/triggers";
-import { Driver } from "./core/dependencies/drivers";
 import { createSubscribers } from './subscribers'
+import Module, { ModuleConfig } from "./core/modules";
+
+const moduleFactory = (deps: Deps, CustomModuleConstructor?: typeof Module) => {
+  return <T extends { id: string }>(config: ModuleConfig<T>) => {
+    if (CustomModuleConstructor) {
+      return new CustomModuleConstructor(config, deps);
+    }
+    return new Module(config, deps);
+  }
+}
 
 export function createApp(manifest: AppManifest) {
   const deps = createDeps(manifest);
   const app = new App(manifest, deps);
+  const modules = Object.keys(manifest.modules);
 
-  // Register modules
-  app.register(devicesModuleFactory(deps, deviceSchemaProvider, new Driver(deps))());
-  app.register(triggersModuleFactory(deps, triggerSchemaProvider)());
+  modules.forEach((module) => { 
+    const m = moduleFactory(deps)(Object.assign({ name: module }, manifest.modules[module] as any));
+    app.register(m);
+  });
 
   createSubscribers(deps);
 
