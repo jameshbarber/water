@@ -66,7 +66,6 @@ export const makeDriver = () => {
 
 export const makeDeps = (): Deps => {
   return {
-    makeModuleDataStore: ()=>(schemas: SchemaProvider<any>)=>jest.fn(),
     logger: makeLogger(),
     eventBus: makeEventBus(),
     database: makeDb(),
