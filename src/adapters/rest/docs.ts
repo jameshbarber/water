@@ -8,7 +8,7 @@ export class OpenAPIDocGenerator implements DocumentGenerator {
 
     registerModule(module: Module<any>) {
         const moduleSchemaProvider = module.schemas;
-        const schema = moduleSchemaProvider?.getSchema?.();
+        const schema = moduleSchemaProvider?.getSchema?.(module.name);
 
         const zodSchema = (schema as any)?.read ?? (schema as any)?.create;
         if (zodSchema) {

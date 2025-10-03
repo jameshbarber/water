@@ -1,6 +1,6 @@
 import { createApp } from "@/index";
 import { AppManifest } from "@/core/app";
-import { ZodSchemaProvider } from "@/adapters/schema";
+import { ZodSchemaProvider } from "@/adapters";
 import { z } from "zod";
 
 const testManifest: AppManifest = {

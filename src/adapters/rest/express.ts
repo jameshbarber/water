@@ -18,7 +18,7 @@ export class ExpressServerAdapter implements ServerAdapter {
 
     register(module: Module<any>) {
         const moduleSchemaProvider = module.schemas;
-        const schema = moduleSchemaProvider?.getSchema?.();
+        const schema = moduleSchemaProvider?.getSchema?.(module.name);
         this.deps.logger?.info(`Registering module ${module.name} with schemas ${JSON.stringify(schema)}`);
         this.deps.docs?.registerModule(module);
         this.createRoutes(createCrudRoutes(module));

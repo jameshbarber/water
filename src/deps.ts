@@ -39,9 +39,9 @@ export function createDeps(manifest: AppManifest): Deps {
 
   const database = createDatabase(manifest.store ?? { type: "json", url: "data.json" });
 
-  const rest = new ExpressServerAdapter({ logger, eventBus, database });
+  const docs = new OpenAPIDocGenerator();
+  const rest = new ExpressServerAdapter({ logger, eventBus, database, docs });
   const mcp = new McpServer({ logger, eventBus, database }, manifest.name, manifest.version);
 
-  const docs = new OpenAPIDocGenerator();
   return { logger, eventBus, rest, mcp, database, docs };
 }
