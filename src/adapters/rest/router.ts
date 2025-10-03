@@ -21,7 +21,7 @@ const createCrudRoutes = (module: Module<any>): Route[] => {
             description: `Get a ${module.name}`,
             method: "get" as Method,
             handler: async (req: any, res: any) => {
-                validateOrThrow(module.schema.getSchema(module.name)?.read, req.params.id, `Invalid ${module.name} id`);
+                validateOrThrow(module.schemas.getSchema()?.read, req.params.id, `Invalid ${module.name} id`);
                 const result = await module.findOne(req.params.id);
                 return res.json(result);
             },
@@ -32,7 +32,7 @@ const createCrudRoutes = (module: Module<any>): Route[] => {
             path: `/${module.name}`,
             method: "get" as Method,
             handler: async (req: any, res: any) => {
-                validateOrThrow(module.schema.getSchema(module.name)?.query, req.query, `Invalid ${module.name} query`);
+                validateOrThrow(module.schemas.getSchema()?.query, req.query, `Invalid ${module.name} query`);
                 const result = await module.findMany(req.query);
                 return res.json(result);
             },
@@ -43,7 +43,7 @@ const createCrudRoutes = (module: Module<any>): Route[] => {
             description: `Create a new ${module.name}`,
             method: "post" as Method,
             handler: async (req: any, res: any) => {
-                validateOrThrow(module.schema.getSchema(module.name)?.create, req.body, `Invalid ${module.name} body`);
+                validateOrThrow(module.schemas.getSchema()?.create, req.body, `Invalid ${module.name} body`);
                 const result = await module.create(req.body);
                 return res.json(result);
             },
@@ -54,7 +54,7 @@ const createCrudRoutes = (module: Module<any>): Route[] => {
             description: `Update a ${module.name}`,
             method: "put" as Method,
             handler: async (req: any, res: any) => {
-                validateOrThrow(module.schema.getSchema(module.name)?.create, req.body, `Invalid ${module.name} body`);
+                validateOrThrow(module.schemas.getSchema()?.create, req.body, `Invalid ${module.name} body`);
                 const result = await module.update(req.params.id, req.body);
                 return res.json(result);
             },
