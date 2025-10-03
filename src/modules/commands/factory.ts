@@ -4,7 +4,7 @@ import { commandSchemaProvider } from "./schema";
 
 const commandsModuleFactory = (deps: Deps) => {
         return () => {
-        const module = new CommandsModule({name: "commands", store: deps.db, eventBus: deps.eventBus, schema: commandSchemaProvider});
+        const module = new CommandsModule({name: "commands", store: deps.db, eventBus: deps.eventBus, schema: commandSchemaProvider, logger: deps.logger});
         return module;
     }
 }

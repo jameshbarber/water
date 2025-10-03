@@ -18,6 +18,7 @@ const makeCommandsModule = () =>
         store: deps.db,
         eventBus: deps.eventBus,
         schema: commandSchemaProvider,
+        logger: deps.logger,
     });
 
 const makeTriggersModule = () =>
@@ -26,12 +27,14 @@ const makeTriggersModule = () =>
         store: deps.db,
         eventBus: deps.eventBus,
         schema: triggerSchemaProvider,
+        logger: deps.logger,
     });
 
 
 
 const makeDevicesModule = () =>
     new DevicesModule({
+        logger: deps.logger,
         name: "devices",
         store: deps.db,
         eventBus: deps.eventBus,

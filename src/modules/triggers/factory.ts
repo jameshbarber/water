@@ -7,7 +7,7 @@ export const triggersModuleFactory = (
   schema: SchemaProvider,
 ) => {
   return () => {
-    const module = new TriggerModule({ name: "triggers", store: deps.db, eventBus: deps.eventBus, schema });
+    const module = new TriggerModule({ name: "triggers", store: deps.db, eventBus: deps.eventBus, schema, logger: deps.logger });
     return module;
   };
 };

@@ -10,7 +10,7 @@ export const devicesModuleFactory = (
 ) => {
   return () => {
     const module = new DevicesModule(
-    { name: "devices", store: deps.db, eventBus: deps.eventBus, schema },
+    { name: "devices", store: deps.db, eventBus: deps.eventBus, schema, logger: deps.logger },
     driver
   );
   return module;

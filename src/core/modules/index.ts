@@ -4,6 +4,7 @@ import { EventBus } from "@/core/dependencies/events";
 import AppError from "../error";
 import App from "../app";
 import { Route } from "../dependencies/interfaces/rest";
+import { Logger } from "../dependencies/logger";
 
 export interface ModuleConfig<T extends { id: string }> {
     name: string;
@@ -11,6 +12,7 @@ export interface ModuleConfig<T extends { id: string }> {
     eventBus: EventBus;
     schema: SchemaProvider;
     app?: App;   
+    logger: Logger;
 }
 
 export default class Module<T extends { id: string }> {
@@ -20,6 +22,7 @@ export default class Module<T extends { id: string }> {
     eventBus: EventBus;
     schema: SchemaProvider;
     app?: App;
+    logger: Logger;
     
     constructor(config: ModuleConfig<T>) {
         this.store = config.store;
@@ -27,6 +30,7 @@ export default class Module<T extends { id: string }> {
         this.eventBus = config.eventBus;
         this.schema = config.schema;
         this.app = config.app;
+        this.logger = config.logger;
     }
 
     async findOne(id: string): Promise<T> {
@@ -45,11 +49,11 @@ export default class Module<T extends { id: string }> {
         })
     }
 
-    create(data: T): Promise<T> {
-        const val = this.store.create({
+    async create(data: T): Promise<T> {
+        const val = await this.store.create({
             data: data
         })
-
+        this.logger.debug(`Emitting event: ${this.name}.created ${JSON.stringify(val)}`);
         this.eventBus.emit(`${this.name}.created`, val);
         return val;
     }
