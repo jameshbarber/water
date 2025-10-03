@@ -1,5 +1,5 @@
 import { createApp } from "./src/index";
-import manifest from "./src/config/manifest";
+import manifest from "./src/manifest";
 
 const {app} = createApp(manifest);
 
